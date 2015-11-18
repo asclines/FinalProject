@@ -4,18 +4,24 @@ using namespace std;
 
 void solve(double* a, double* b, double* c, double* d, int n) {
     n--; // since we start from x0 (not x1)
+   
+//Step 1
     c[0] /= b[0];
     d[0] /= b[0];
 
     for (int i = 1; i < n; i++) {
+//Step 2	
 	c[i] /= b[i] - a[i]*c[i-1];
+
+//Step 3
         d[i] = (d[i] - a[i]*d[i-1]) / (b[i] - a[i]*c[i-1]);
     }
-
+//Step 4
     d[n] = (d[n] - a[n]*d[n-1]) / (b[n] - a[n]*c[n-1]);
 
     for (int i = n; i-- > 0;) {
-        d[i] -= c[i]*d[i+1];
+//Step 5
+	d[i] -= c[i]*d[i+1];
     }
 }
 
@@ -30,6 +36,5 @@ int main() {
 	for (int i = 0; i < n; i++) {
 		cout << d[i] << endl;
 	}
-	cout << endl << "n= " << n << endl << "n is not changed hooray !!";
 	return 0;
 }

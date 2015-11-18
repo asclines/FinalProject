@@ -1,6 +1,10 @@
-CC=g++
+CC=nvcc
 DEBUG=-g -G
+SD= cu_triSolver.cu cu_triSolver.h
 
-triSymSolver: triSymSolver.cpp
-	$(CC) -o triSymSolver triSymSolver.cpp
+program: triSolver.cu $(SD)
+	$(CC) -o program triSolver.cu
+
+
+
 

@@ -12,7 +12,7 @@ using namespace std;
  */
 void solve(double* b, double* a,double* d, int n) {
     n--; // since we start from x0 (not x1)
-    a[0] /= a[0];
+    b[0] /= a[0];
     d[0] /= a[0];
 
     for (int i = 1; i < n; i++) {

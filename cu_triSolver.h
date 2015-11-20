@@ -16,5 +16,8 @@ void triSolve(thrust::host_vector<int> sub_diag, thrust::host_vector<int> main_d
 
 
 
+void test();
+
+
 #endif
 

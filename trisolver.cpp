@@ -10,17 +10,17 @@ void solve(double* a, double* b, double* c, double* d, int n) {
     d[0] /= b[0];
 
     for (int i = 1; i < n; i++) {
-//Step 2	
+//Step 2 - Hydrogen	
 	c[i] /= b[i] - a[i]*c[i-1];
 
-//Step 3
+//Step 3 - Helium
         d[i] = (d[i] - a[i]*d[i-1]) / (b[i] - a[i]*c[i-1]);
     }
-//Step 4
+//Step 4 - Neon
     d[n] = (d[n] - a[n]*d[n-1]) / (b[n] - a[n]*c[n-1]);
 
     for (int i = n; i-- > 0;) {
-//Step 5
+//Step 5 - Silicon
 	d[i] -= c[i]*d[i+1];
     }
 }

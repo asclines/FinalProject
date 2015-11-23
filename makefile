@@ -13,5 +13,6 @@ cu_triSolver.o: $(TS)
 test_all: test_all.cu test_functors.cu test_input.cu test_solver.cu
 	$(CC) -o test_all test_all.cu $(LIBS)
 
-
+clean:
+	rm *.o
 

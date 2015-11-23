@@ -3,20 +3,24 @@
 
 #include <thrust/host_vector.h>
 
+
+
 /**
- * This method is what will be called to do the actual calculations.
+ * This method will perform the cyclic reduction method of solving tridiagaonl matrices.
+ * 
  * Parameters:
- * - sub_diag The sub diagonal of the matrix (a in the diagram)
- * - main_diag The main diagonal of the matrix (b in the diagram)
- * - super_diag The super diagonal of the matrix (c in the diagram)
- * - size The size of the vectors being passed in
+ * - size - The dimmension of the matrix
+ * - vect_a - The sub diagonal of the matrix
+ * - vect_b - The main diagonal of the matrix
+ * - vect_c - The super diagonal of the matrix
+ * - vect_d - The result column
+ *
+ * Returns:
+ * - Vector containing the resuls 
  */
- 
-void triSolve(thrust::host_vector<int> sub_diag, thrust::host_vector<int> main_diag, thrust::host_vector<int> super_diag, thrust::host_vector<int> col_sol, int size); 
+thrust::host_vector<double>  crSolve(int size, thrust::host_vector<double> vect_a, thrust::host_vector<double> vect_b, thrust::host_vector<double> vect_c, thrust::host_vector<double> vect_d);
 
 
-
-void test();
 
 
 #endif

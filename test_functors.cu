@@ -25,3 +25,13 @@ TEST( FunctorTest, AlphaBeta){
 	AlphaBeta alphaBeta;
 	EXPECT_EQ(-2 ,alphaBeta(4,2));
 }
+
+TEST( FunctorTest, AC){
+	AC ac;
+	EXPECT_EQ(-1.5 ,ac(1,2,3));
+}
+
+TEST( FunctorTest, BD){
+	BD bd;
+	EXPECT_EQ(27 , bd(1,2,3,4,5));
+}

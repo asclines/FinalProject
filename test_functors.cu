@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "cu_functors.cu"
+#include "cu_cr_functors.cu"
 
 //Functor tests go here
 TEST( FunctorTest, Hydrogen){
@@ -17,4 +18,10 @@ TEST( FunctorTest, Helium){
 TEST( FunctorTest, Silicon){
 	Silicon silicon;
 	EXPECT_EQ(-1 ,silicon(1,2,3));
+}
+
+
+TEST( FunctorTest, AlphaBeta){
+	AlphaBeta alphaBeta;
+	EXPECT_EQ(-2 ,alphaBeta(4,2));
 }

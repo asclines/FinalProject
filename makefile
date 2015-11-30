@@ -1,9 +1,9 @@
 #-----MACROS----#
 #Compiler Macros
 CC=nvcc
-DEBUG=-g -G
+DB=-g -G
 LIBS=-lgtest -lpthread
-IF = -I ./ #for internal files
+IF = -I ./  #for internal files
 
 #Locations
 CR = cyclic-reduction/
@@ -14,6 +14,7 @@ TS= cu_triSolver.cu cu_triSolver.h cu_functors.cu
 SD= cu_triSolver.cu cu_triSolver.h cu_functors.cu
 
 #Cyclic-Reduction Method
+CRM = $(CR)cu_cr_functors.cu $(CR)cu_cr_solver.cu $(CR)cu_cr_solver.h $(CR)cu_cr_internal.h
 
 #Test Files
 TF = test_all.cu test_input.cu test_solver.cu test_functors.cu
@@ -34,10 +35,10 @@ clean_objs:
 #-----MAKE COMMANDS-----
 
 program: triSolver.cu cu_triSolver.o
-	$(CC) $(IF) -o program cu_triSolver.o triSolver.cu
+	$(CC) -o program cu_triSolver.o triSolver.cu
 
-test_all: $(TF)
-	$(CC) $(IF) -o test_all test_all.cu $(LIBS)
+test_all: $(TF) cu_cr.o
+	$(CC) $(IF) cu_cr_solver.o -o test_all test_all.cu $(LIBS)
 
 
 #-----OBJECT COMMANDS-----
@@ -45,6 +46,8 @@ test_all: $(TF)
 cu_triSolver.o: $(TS)
 	$(CC) -c  cu_triSolver.cu
 
+cu_cr.o: $(CRM)
+	$(CC) $(IF) -c $(CR)cu_cr_solver.cu
 
 
 

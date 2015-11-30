@@ -1,9 +1,9 @@
 #include "gtest/gtest.h"
 
-//Thrust call tests go here
-
-
-
+#include "test_functors.cu"
+#include "test_input.cu"
+#include "test_solver.cu"
+#include "test_cr.cu"
 
 int main(int argc, char **argv){
 	::testing::InitGoogleTest(&argc,argv);

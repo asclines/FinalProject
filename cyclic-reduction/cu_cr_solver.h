@@ -1,5 +1,5 @@
-#ifndef CU_TRI_SOLVER_H
-#define CU_TRI_SOLVER_H
+#ifndef CU_CR_SOLVER_H
+#define CU_CR_SOLVER_H
 
 #include <thrust/host_vector.h>
 

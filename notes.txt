@@ -1,0 +1,2 @@
+-AC
+Upper and lower diagonals have 1 less element that main diagonal. To correct offset, prepend 0 to a and append 0 to c

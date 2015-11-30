@@ -3,7 +3,7 @@
 #include <math.h>
 
 thrust::host_vector<double>  crSolve(int size, thrust::host_vector<double> vect_a, thrust::host_vector<double> vect_b, thrust::host_vector<double> vect_c, thrust::host_vector<double> vect_d){
-
+/*
 	n--; //Cause vectors start at 0
 	
 	int q;
@@ -14,7 +14,7 @@ thrust::host_vector<double>  crSolve(int size, thrust::host_vector<double> vect_
 	}
 
 
-
+*/
 
 }
 

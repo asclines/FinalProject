@@ -3,6 +3,11 @@
 CC=nvcc
 DEBUG=-g -G
 LIBS=-lgtest -lpthread
+IF = -I ./ #for internal files
+
+#Locations
+CR = cyclic-reduction/
+
 
 #Thomas Algorithm Serial Method
 TS= cu_triSolver.cu cu_triSolver.h cu_functors.cu
@@ -15,22 +20,24 @@ TF = test_all.cu test_input.cu test_solver.cu test_functors.cu
 
 #-----RUN COMMANDS-----
 
-run: program clean
+run: program clean_objs
 	./program
 
-test: test_all clean
-	./test_all
+test: test_all clean_objs
+	./test_all 
 
 clean:
 	@(rm *.o program test_all) &> /dev/null || true
+clean_objs:
+	@(rm *.o) &> /dev/null || true
 
 #-----MAKE COMMANDS-----
 
 program: triSolver.cu cu_triSolver.o
-	$(CC) -o program cu_triSolver.o triSolver.cu
+	$(CC) $(IF) -o program cu_triSolver.o triSolver.cu
 
 test_all: $(TF)
-	$(CC) -o test_all test_all.cu $(LIBS)
+	$(CC) $(IF) -o test_all test_all.cu $(LIBS)
 
 
 #-----OBJECT COMMANDS-----

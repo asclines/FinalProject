@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include "cu_functors.cu"
-#include "cu_cr_functors.cu"
+#include <cyclic-reduction/cu_cr_functors.cu>
 
 //Functor tests go here
 TEST( FunctorTest, Hydrogen){

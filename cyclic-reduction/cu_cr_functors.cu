@@ -1,6 +1,6 @@
 #include <cuda.h>
 
-
+namespace cyclic_reduction{
 /**
 * Calculates:
 *	alpha_i = -a_i/b_(i-2^(l-i))
@@ -16,9 +16,45 @@
 struct AlphaBeta{
 	__host__ __device__
 	double operator()(double x, double y){
-		return (-x)/y;
+		if(y == 0.00){
+			return 0.00;
+		} else{
+			return (-x)/y;
+		}
 	}
 };
+
+
+
+
+
+struct FirstStepFunctor{
+	
+	__host__ __device__
+	double operator()(double a, double b){
+		if(b == 0.00){
+			return 0.00;
+		} else{
+			return -a/b;
+		}	
+	}
+};
+
+struct SecondStepFunctor{
+	__host__ __device__
+	double operator()(double c, double b){
+		if(b == 0.00){
+			return 0.00;
+		}else{
+			return -c/b;
+		}
+	}
+};	
+
+}
+
+
+
 
 
 /**
@@ -36,7 +72,7 @@ struct AlphaBeta{
 struct AC{
 	__host__ __device__
 	double operator()(double x, double y, double z){
-		AlphaBeta alphaBeta;
+		cyclic_reduction::AlphaBeta alphaBeta;
 		return alphaBeta(x,y)*z;
 	}
 };

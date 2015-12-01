@@ -2,7 +2,102 @@
 #include "cu_cr_internal.h"
 #include "cu_cr_functors.cu"
 
+#include <cuda.h>
 #include <math.h>
+
+
+#include <thrust/functional.h>
+
+namespace cyclic_reduction{
+
+//(rank - span >= 0)
+void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b){
+
+	InitDPtrD(n,d_ptr_a_prime);
+	thrust::transform(
+		d_ptr_a + level, d_ptr_a + n,
+		d_ptr_b,
+		d_ptr_a_prime + level,
+		AlphaBeta()
+	);
+		
+}
+
+//(rank + span < n)
+void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
+
+	InitDPtrD(n,d_ptr_c_prime);	
+	thrust::transform(
+		d_ptr_c , d_ptr_c + (n-level),
+		d_ptr_b + level,
+		d_ptr_c_prime,
+		AlphaBeta()
+	);
+
+}
+
+//(rank - span >= 0)
+void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c){
+
+	DVectorD d_vect_temp(n); //TODO see about freeing this memory, and condensing space
+	InitDPtrD(n, d_vect_temp.data());
+	
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_c,
+		d_vect_temp.begin() + level,
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_b + level, d_ptr_b + n,
+		d_vect_temp.begin() + level,
+		d_ptr_b + level,
+		thrust::plus<double>()
+	);
+
+}
+
+//(rank + span < n)
+void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b){
+
+	DVectorD d_vect_temp(n);
+	InitDPtrD(n, d_vect_temp.data());
+	
+	thrust::transform(
+		d_ptr_c_prime , d_ptr_c_prime + (n - level),
+		d_ptr_a + level,
+		d_vect_temp.begin(),
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_b , d_ptr_b + (n - level),
+		d_vect_temp.begin(),
+		d_ptr_b,
+		thrust::plus<double>()
+	);
+}
+
+/*
+*	Utility Methods
+*/
+
+/**
+* Initializes a DPtrD with 0.00 for each element. 
+* Params:
+*	n Size of vector
+*	d_ptr Ptr to initial value of vector
+**/
+
+void InitDPtrD(int n, DPtrD d_ptr){
+	thrust::fill(
+		d_ptr, d_ptr + n,
+		0.00
+	);				
+}
+
+}//END - namespace
 
 /**
 * Main method to call in order to solve a tridiagonal matrix using Cyclic-Reduction
@@ -54,7 +149,7 @@ void calc_init(int n,
 		d_ptr_a + 1, d_ptr_a + n,
 		d_ptr_b, 
 		d_vect_alpha.begin(),
-		AlphaBeta()
+		cyclic_reduction::AlphaBeta()
 	);
 
 	thrust::transform(

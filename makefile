@@ -4,6 +4,7 @@ CC=nvcc
 DB=-g -G
 LIBS=-lgtest -lpthread
 IF = -I ./  #for internal files
+CFLAGS=--std=c++11 -g -G -pg -O0
 
 #Locations
 CR = cyclic-reduction/
@@ -38,7 +39,7 @@ program: triSolver.cu cu_triSolver.o
 	$(CC) -o program cu_triSolver.o triSolver.cu
 
 test_all: $(TF) cu_cr.o
-	$(CC) $(IF) cu_cr_solver.o -o test_all test_all.cu $(LIBS)
+	$(CC) $(IF) cu_cr_solver.o -o test_all test_all.cu $(LIBS) $(CFLAGS) 
 
 
 #-----OBJECT COMMANDS-----
@@ -47,7 +48,7 @@ cu_triSolver.o: $(TS)
 	$(CC) -c  cu_triSolver.cu
 
 cu_cr.o: $(CRM)
-	$(CC) $(IF) -c $(CR)cu_cr_solver.cu
+	$(CC) $(IF) -c $(CR)cu_cr_solver.cu $(CFLAGS)
 
 
 

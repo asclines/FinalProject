@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "cu_functors.cu"
-#include "./cyclic-reduction/cu_cr_functors.cu"
+//#include "./cyclic-reduction/cu_cr_functors.cu"
+#include <cyclic-reduction/cu_cr_functors.cu>
 
 #define CRFTEST(name) \
 	TEST(CyclicReductionFunctorTest,name)

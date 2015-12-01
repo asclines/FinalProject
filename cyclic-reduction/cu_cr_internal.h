@@ -118,7 +118,15 @@ namespace cyclic_reduction{
 	 */	
 	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
 
-
+	/*
+	 * TODO needs testing
+	 * Modifies d_ptr_x
+	 *
+	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position in the 
+	 * upper diagonal with neighboring element in the right side column to the qualifying solution
+	 * column elements.
+	 */
+	void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
 
 //Utility Methods
 

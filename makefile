@@ -26,7 +26,7 @@ CRM = $(addprefix $(CR), cu_cr_functors.cu cu_cr_solver.cu cu_cr_solver.h cu_cr_
 #Test Files
 TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu test_functors.cu)
 #-----RUN COMMANDS-----
-build: init program
+install: init program
 
 run: 
 	./program
@@ -46,7 +46,7 @@ init:
 	@(mkdir bin) &> /dev/null || true
 
 program: triSolver.cu $(OBJS)
-	$(CC) -o program cu_triSolver.o triSolver.cu
+	$(CC) $(IF) $(OBJS)-o program triSolver.cu
 
 test_all: $(TF) $(OBJS)
 	$(CC) $(IF) $(OBJS)  -o test_all $(TEST)test_all.cu $(LIBS) $(CFLAGS)

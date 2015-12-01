@@ -67,17 +67,17 @@ void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d
 	DVectorD d_vect_temp(n);
 
 	thrust::transform(
-		d_ptr_a_prime + level, d_ptr_a_ptrime + n,
-		d_ptr_d,
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_d + level,
 		d_vect_temp.begin(),
-		thrust::multiples<double>()
+		thrust::multiplies<double>()
 	);
 
 	thrust::transform(
 		d_ptr_x + level, d_ptr_x + n,
 		d_vect_temp.begin(),
 		d_ptr_x + level,
-		thrust::multiples<double>()
+		thrust::plus<double>()
 	);
 
 }
@@ -93,10 +93,6 @@ void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 	);	
 }
 
-
-void SolutionBack(){
-//TODO
-}
 
 
 //(rank + span < n)
@@ -119,6 +115,26 @@ void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_
 		thrust::plus<double>()
 	);
 }
+
+void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x){
+	DVectorD d_vect_temp(n); 
+	
+	thrust::transform(
+		d_ptr_c_prime, d_ptr_c_prime + (n-level),
+		d_ptr_d + level,
+		d_vect_temp.begin(),
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_x + level, d_ptr_x + n,
+		d_vect_temp.begin(),
+		d_ptr_x + level,
+		thrust::plus<double>()
+	);
+
+}
+
 
 void UpperBack(){
 //TODO

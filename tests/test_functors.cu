@@ -1,7 +1,7 @@
 #include "gtest/gtest.h"
 #include "cu_functors.cu"
 //#include "./cyclic-reduction/cu_cr_functors.cu"
-#include <cyclic-reduction/cu_cr_functors.cu>
+//#include <cyclic-reduction/cu_cr_functors.cu>
 
 #define CRFTEST(name) \
 	TEST(CyclicReductionFunctorTest,name)
@@ -25,7 +25,7 @@ TEST( FunctorTest, Silicon){
 }
 
 
-
+/*
 
 TEST( FunctorTest, AC){
 	AC ac;
@@ -36,13 +36,13 @@ TEST( FunctorTest, BD){
 	BD bd;
 	EXPECT_EQ(27 , bd(1,2,3,4,5));
 }
-
+*/
 
 /*
 *	Cyclic Reduction Functor Tests
 */
 
-
+/*
 
 CRFTEST( AlphaBeta){
 	cyclic_reduction::AlphaBeta alphaBeta;
@@ -55,4 +55,4 @@ CRFTEST( FirstStepFunctor){
 	cyclic_reduction::FirstStepFunctor functor;
 	EXPECT_EQ(0.00,functor(1.00,0.00));
 }
-
+*/

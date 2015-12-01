@@ -1,6 +1,9 @@
-#include "cu_cr_solver.h"
-#include "cu_cr_internal.h"
-#include "cu_cr_functors.cu"
+//#include "cu_cr_solver.h"
+//#include "cu_cr_internal.h"
+#include <cyclic-reduction/cu_cr_solver.h>
+#include <cyclic-reduction/cu_cr_internal.h>
+#include <cyclic-reduction/cu_cr_functors.cu>
+//#include "cu_cr_functors.cu"
 
 #include <cuda.h>
 #include <math.h>

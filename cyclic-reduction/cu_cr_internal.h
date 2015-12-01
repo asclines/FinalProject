@@ -11,7 +11,25 @@
  * 	This header file contains all foward declarations of methods used internall by
  * 	cu_cr_solver.cu
  *	This file also serves as an interface to be used by testing.
- *	For method documentation see cu_cr_solver.cu
+ *	For method documentation see method declarations below.
+ *
+ *	Common parameters used by methods:
+ *		n Size of diagonal
+ *		level Reduction level
+ *
+ *		d_ptr_a Pointer to first element of lower diagonal device vector
+ *		d_ptr_a_prime Pointer to first element of temp lower diagonal device vector
+ *
+ *		d_ptr_b Pointer to first element of main diagonal device vector
+ *		d_ptr_b_prime Pointer to first element of temp main diagonal device vector
+ *
+ *		d_ptr_c Pointer to first element of upper diagonal device vector
+ *		d_ptr_c_prime Pointer to first element of temp upper diagonal device vector
+ *
+ *		d_ptr_d Pointer to first element of column vector of right hand side of the equation Ax=B
+ *
+ *		d_ptr_x Pointer to first element of column vector containing solutions
+ *
  */
 
 int calc_q(int n);
@@ -39,12 +57,53 @@ namespace cyclic_reduction{
  * 	FOWARD DECLARATIONS
  */
 
-//Calculation Methods
+//Calculation Methods - In order of definition in cu_cr_solver.cu
+	
+	/*
+ 	* Modifies d_ptr_a_prime
+ 	*
+	* Performs AlphaBeta calculation for all elements in the lower diagonal where the 
+	* element position - reduction level >= 0.
+	* Stores the calculations in d_ptr_a_prime.
+	*/
 	void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b);
-	void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime);
-	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
-	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
 
+	/*
+	* Modifies d_ptr_c_prime
+	*
+	* Performs AlphaBeta calculation for all elements in the upper diagonal where the
+	* element position + reduction level < size of diagonal.
+	* Stores the calculations in d_ptr_c_prime.
+	*/	
+	void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime);
+	
+	/*
+ 	 * Modifies d_ptr_a_prime
+ 	 *
+ 	 * Multiples each qualifying element in the lower diagonal by its AlphaBeta calculation
+ 	 */
+	void LowerFront(int n, int level DPtrD d_ptr_a, DPtrD d_ptr_a_prime);
+
+	/*
+	 * Modifies d_ptr_d
+	 *
+ 	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation
+ 	 * of the element at the same position in the lower diagonal with neighboring upper element.
+ 	 * Then adds the result of the multiplication to the value of the element in the main diagonal.
+ 	 * Stores result at position of element in the main diagonal.
+ 	 */	
+	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
+
+
+	/*
+	 * Modifies d_ptr_d
+	 *
+	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation of the 
+	 * element at the same position in the upper diagonal with neighboring lower element.
+	 * Then adds the result of the multiplicaiton to the value of the element in the main diagonal.
+	 * Stores result at position of element in the main diagonal.
+	 */	
+	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
 
 //Utility Methods
 	void InitDPtrD(int n, DPtrD d_ptr);

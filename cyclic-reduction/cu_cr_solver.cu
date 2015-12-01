@@ -1,9 +1,6 @@
-//#include "cu_cr_solver.h"
-//#include "cu_cr_internal.h"
 #include <cyclic-reduction/cu_cr_solver.h>
 #include <cyclic-reduction/cu_cr_internal.h>
 #include <cyclic-reduction/cu_cr_functors.cu>
-//#include "cu_cr_functors.cu"
 
 #include <cuda.h>
 #include <math.h>
@@ -11,9 +8,14 @@
 
 #include <thrust/functional.h>
 
+/*
+* For method documentation see cu_cr_internal.h unless otherwise specified.
+*/
+
+
 namespace cyclic_reduction{
 
-//(rank - span >= 0)
+
 void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b){
 
 	InitDPtrD(n,d_ptr_a_prime);
@@ -26,7 +28,6 @@ void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD 
 		
 }
 
-//(rank + span < n)
 void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
 
 	InitDPtrD(n,d_ptr_c_prime);	
@@ -39,8 +40,14 @@ void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_
 
 }
 
-void LowerFront(){
-//TODO
+void LowerFront(int n, int level DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
+
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_a_prime + level,
+		d_ptr_a,
+		thrust::multiplies<double>()
+	);	
 }
 
 //(rank - span >= 0)
@@ -65,13 +72,15 @@ void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr
 
 }
 
-void UpperFront(){
-//TODO
+void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x ){
+
+		
+
 }
 
 
 
-void LowerBack(){
+void SolutionBack(){
 //TODO
 }
 

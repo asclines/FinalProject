@@ -35,7 +35,7 @@ test: init test_all
 	./test_all 
 
 clean:
-	@(rm bin/* program test_all) &> /dev/null || true
+	@(rm bin/* *.out program test_all) &> /dev/null || true
 
 clean_objs:
 	@(rm *.o) &> /dev/null || true

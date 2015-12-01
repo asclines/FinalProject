@@ -5,7 +5,7 @@
 #include <cuda.h>
 #include <math.h>
 
-
+#include <thrust/copy.h>
 #include <thrust/functional.h>
 
 /*
@@ -40,7 +40,7 @@ void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_
 
 }
 
-void LowerFront(int n, int level DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
+void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
@@ -116,18 +116,15 @@ void UpperBack(){
 *	Utility Methods
 */
 
-/**
-* Initializes a DPtrD with 0.00 for each element. 
-* Params:
-*	n Size of vector
-*	d_ptr Ptr to initial value of vector
-**/
-
 void InitDPtrD(int n, DPtrD d_ptr){
 	thrust::fill(
 		d_ptr, d_ptr + n,
 		0.00
 	);				
+}
+
+void InitSolutionDPtrD(int n, DPtrD d_ptr_d, DPtrD d_ptr_x){
+	thrust::copy_n(d_ptr_d, n, d_ptr_x);	
 }
 
 }//END - namespace

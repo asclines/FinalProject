@@ -82,7 +82,7 @@ namespace cyclic_reduction{
  	 *
  	 * Multiples each qualifying element in the lower diagonal by its AlphaBeta calculation
  	 */
-	void LowerFront(int n, int level DPtrD d_ptr_a, DPtrD d_ptr_a_prime);
+	void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime);
 
 	/*
 	 * Modifies d_ptr_d
@@ -106,7 +106,21 @@ namespace cyclic_reduction{
 	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
 
 //Utility Methods
+
+	/*
+	 * Modifies d_ptr
+	 * Fills vector with 0.00
+	 *
+	 * Params:
+	 * 	d_ptr Device pointer to first element in vector to be filled
+	 */
 	void InitDPtrD(int n, DPtrD d_ptr);
+
+	/*
+	 * Modifies d_ptr_x
+	 * Copies all the elements from the the right side column into the solution column
+	 */
+	void InitSolutionDPtrD(int n, DPtrD d_ptr_d, DPtrD d_ptr_x);
 	
 
 }

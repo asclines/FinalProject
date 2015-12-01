@@ -1,8 +1,12 @@
 #include "gtest/gtest.h"
 #include <cyclic-reduction/cu_cr_internal.h>
 
-#define CRTEST(name) \
-	TEST(CyclicReductionTest,name)	
+
+#define CRCTEST(name) \
+	TEST(CyclicReductionCalculationTest,name)	
+
+#define CRUTEST(name) \
+	TEST(CyclicReductionUtilityTest,name)
 
 
 
@@ -20,7 +24,7 @@ using namespace cyclic_reduction;
 *	Calculation Method Tests
 */
 
-CRTEST(LowerAlphaBeta){
+CRCTEST(LowerAlphaBeta){
 //Declarations
 	int n = 5;
 	int level = 3;
@@ -101,7 +105,7 @@ CRTEST(LowerAlphaBeta){
 *		Utility Method Tests
 */
 
-CRTEST(InitDPtrD){
+CRUTEST(InitDPtrD){
 	int n = 10;
 	DVectorD vect_test(n);
 	
@@ -118,8 +122,41 @@ CRTEST(InitDPtrD){
 	}
 }
 	
+CRUTEST(InitSolutionDPtrD){
+	int n = 10;
+	
+	HVectorD h_vect_test(n),
+		h_vect_results(n);
 
-CRTEST(QCalc){
+	DVectorD d_vect_test(n),
+		d_vect_results(n);
+
+
+	//Setup vector initial values
+	for(int i = 0; i < n; i++){
+		h_vect_results[i] = 1000 + i;
+		h_vect_test[i] = 0.00;
+	}
+
+	//Copy from host to device
+	d_vect_test = h_vect_test;
+	d_vect_results = h_vect_results;
+
+	//Call method to be tested
+	InitSolutionDPtrD(n, d_vect_results.data(), d_vect_test.data());
+
+	//Copy from device to host
+	h_vect_test = d_vect_test;
+	h_vect_results = d_vect_results;
+
+	//Check results 
+	for(int i = 0; i < n; i++){
+		EXPECT_EQ(h_vect_results[i],d_vect_test[i]);
+	}
+
+}
+
+CRUTEST(QCalc){
 	//Test even and odd numbers where ouput IS NOT a whole number
 	EXPECT_EQ(2,calc_q(5));
 	EXPECT_EQ(3,calc_q(12));

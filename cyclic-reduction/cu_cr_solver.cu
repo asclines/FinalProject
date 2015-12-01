@@ -40,16 +40,6 @@ void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_
 
 }
 
-void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
-
-	thrust::transform(
-		d_ptr_a_prime + level, d_ptr_a_prime + n,
-		d_ptr_a_prime + level,
-		d_ptr_a,
-		thrust::multiplies<double>()
-	);	
-}
-
 //(rank - span >= 0)
 void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c){
 
@@ -59,25 +49,49 @@ void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
 		d_ptr_c,
-		d_vect_temp.begin() + level,
+		d_vect_temp.begin(),
 		thrust::multiplies<double>()
 	);
 
 	thrust::transform(
 		d_ptr_b + level, d_ptr_b + n,
-		d_vect_temp.begin() + level,
+		d_vect_temp.begin(),
 		d_ptr_b + level,
 		thrust::plus<double>()
 	);
 
 }
 
-void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x ){
 
-		
+void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x ){
+	DVectorD d_vect_temp(n);
+
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_ptrime + n,
+		d_ptr_d,
+		d_vect_temp.begin(),
+		thrust::multiples<double>()
+	);
+
+	thrust::transform(
+		d_ptr_x + level, d_ptr_x + n,
+		d_vect_temp.begin(),
+		d_ptr_x + level,
+		thrust::multiples<double>()
+	);
 
 }
 
+
+void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
+
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_a_prime + level,
+		d_ptr_a,
+		thrust::multiplies<double>()
+	);	
+}
 
 
 void SolutionBack(){

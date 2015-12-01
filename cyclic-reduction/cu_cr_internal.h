@@ -60,42 +60,55 @@ namespace cyclic_reduction{
 //Calculation Methods - In order of definition in cu_cr_solver.cu
 	
 	/*
- 	* Modifies d_ptr_a_prime
- 	*
-	* Performs AlphaBeta calculation for all elements in the lower diagonal where the 
-	* element position - reduction level >= 0.
-	* Stores the calculations in d_ptr_a_prime.
-	*/
+  	 * Modifies d_ptr_a_prime
+ 	 *
+	 * Performs AlphaBeta calculation for all elements in the lower diagonal where the 
+	 * element position - reduction level >= 0.
+	 * Stores the calculations in d_ptr_a_prime.
+	 */
 	void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b);
 
 	/*
-	* Modifies d_ptr_c_prime
-	*
-	* Performs AlphaBeta calculation for all elements in the upper diagonal where the
-	* element position + reduction level < size of diagonal.
-	* Stores the calculations in d_ptr_c_prime.
-	*/	
+	 * TODO needs testing
+	 * Modifies d_ptr_c_prime
+	 *
+	 * Performs AlphaBeta calculation for all elements in the upper diagonal where the
+	 * element position + reduction level < size of diagonal.
+	 * Stores the calculations in d_ptr_c_prime.
+	 */	
 	void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime);
 	
 	/*
+	 * TODO needs testing
+	 * Modifies d_ptr_d
+	 *
+ 	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position
+ 	 * in the lower diagonal with neighboring upper element to qualifying main diagonal elements.
+ 	 * Stores result at position of element in the main diagonal.
+ 	 */	
+	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
+
+	/*
+	 * TODO needs testing
+	 * Modifies d_ptr_x
+	 *
+	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position
+	 * in the lower diagonal with neighboring element in the right side column to the qualifying
+	 * solution column elements.
+	 */
+	void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
+
+	/*
+ 	 * TODO needs testing
  	 * Modifies d_ptr_a_prime
  	 *
  	 * Multiples each qualifying element in the lower diagonal by its AlphaBeta calculation
  	 */
 	void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime);
 
-	/*
-	 * Modifies d_ptr_d
-	 *
- 	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation
- 	 * of the element at the same position in the lower diagonal with neighboring upper element.
- 	 * Then adds the result of the multiplication to the value of the element in the main diagonal.
- 	 * Stores result at position of element in the main diagonal.
- 	 */	
-	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
-
 
 	/*
+	 * TODO needs testing
 	 * Modifies d_ptr_d
 	 *
 	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation of the 
@@ -104,6 +117,8 @@ namespace cyclic_reduction{
 	 * Stores result at position of element in the main diagonal.
 	 */	
 	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
+
+
 
 //Utility Methods
 

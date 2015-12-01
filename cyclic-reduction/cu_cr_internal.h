@@ -128,6 +128,18 @@ namespace cyclic_reduction{
 	 */
 	void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
 
+	
+	/*
+	 * TODO needs testing
+	 * Modifies d_ptr_c_prime
+	 *
+	 * Multiples AlphaBeta calculation of qualifying elements in upper diagonal by neighbor element in 
+	 * upper diagonal.
+	 */
+	void UpperBack(int n, int level, DPtrD d_ptr_c, DPtrD d_ptr_c_prime);
+
+
+
 //Utility Methods
 
 	/*

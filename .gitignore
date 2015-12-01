@@ -1,0 +1,5 @@
+# Vim Files
+.*.swp
+
+# Generated Files
+bin/

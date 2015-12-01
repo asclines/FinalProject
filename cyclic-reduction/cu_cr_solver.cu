@@ -39,6 +39,10 @@ void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_
 
 }
 
+void LowerFront(){
+//TODO
+}
+
 //(rank - span >= 0)
 void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c){
 
@@ -61,6 +65,17 @@ void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr
 
 }
 
+void UpperFront(){
+//TODO
+}
+
+
+
+void LowerBack(){
+//TODO
+}
+
+
 //(rank + span < n)
 void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b){
 
@@ -81,6 +96,12 @@ void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_
 		thrust::plus<double>()
 	);
 }
+
+void UpperBack(){
+//TODO
+}
+
+
 
 /*
 *	Utility Methods

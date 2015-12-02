@@ -32,7 +32,7 @@ host_vector<double> serial_solve(double n, host_vector<double> a, host_vector<do
 	return d;
 }
 
-
+/*
 int main(){
 	double n = 4;
 	host_vector<double> a(4);
@@ -52,4 +52,4 @@ int main(){
 	}
 
 	return 0;
-}
+}*/

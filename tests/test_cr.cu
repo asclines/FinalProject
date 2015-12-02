@@ -307,7 +307,7 @@ CRCTEST(MainFront){
 	}
 
 }
-
+/*
 CRCTEST(SolutionFront){
 	//Declarations
 	int n = 10;
@@ -331,7 +331,7 @@ CRCTEST(SolutionFront){
 		h_vect_x[i] = i+3;
 	
 		//Fill D
-		h_vect_c[i] = i+2;
+		h_vect_d[i] = i+2;
 	}
 
 	//Fill results	
@@ -344,8 +344,8 @@ CRCTEST(SolutionFront){
 	}
 
 	utils::PrintVector(true,"A'",h_vect_a_prime);
-	utils::PrintVector(true,"B",h_vect_b);
-	utils::PrintVector(true,"C",h_vect_c);
+	utils::PrintVector(true,"D",h_vect_d);
+	utils::PrintVector(true,"X",h_vect_x);
 	utils::PrintVector(true,"Results",h_vect_results);
 
 
@@ -359,8 +359,8 @@ CRCTEST(SolutionFront){
 //Call method to be tested
 	MainFront(n,level,
 		d_vect_a_prime.data(),
-		d_vect_b.data(),
-		d_vect_c.data()
+		d_vect_d.data(),
+		d_vect_x.data()
 	);
 
 
@@ -373,7 +373,7 @@ CRCTEST(SolutionFront){
 	}
 
 }
-
+*/
 /*
 * ==========Utility Method Tests==========
 */

@@ -15,10 +15,12 @@ UTIL = utils/
 #Objects
 OBJ_CR = $(OBJDIR)cu_cr_solver.o
 OBJ_UTILS = $(OBJDIR)utils.o
+OBJ_SS = $(OBJDIR)serial_solver.o
 OBJ_TS = $(OBJDIR)cu_triSolver.o
-OBJS = $(OBJ_CR) $(OBJ_UTILS)
+OBJS = $(OBJ_CR) $(OBJ_UTILS) $(OBJ_SS)
 
 #Thomas Algorithm Serial Method
+SS = serial_tSolver.cu serial_tSolver.h
 TS= cu_triSolver.cu cu_triSolver.h cu_functors.cu
 SD= cu_triSolver.cu cu_triSolver.h cu_functors.cu
 
@@ -60,7 +62,9 @@ program: triSolver.cu $(OBJS)
 test_all: $(TF) $(OBJS)
 	$(CC) $(IF) $(OBJS)  -o test_all $(TEST)test_all.cu $(LIBS) $(CFLAGS)
 
-cr: $(OBJ_CR) 
+cr: $(OBJ_CR)
+
+ss: $(OBJ_SS) 
 
 utils: $(OBJ_UTILS)
 
@@ -75,5 +79,8 @@ $(OBJ_CR): $(CRM)
 
 $(OBJ_UTILS): $(UTILS)
 	$(CC) $(IF) -c $(UTIL)utils.cu $(CFLAGS) -o $@
+
+$(OBJ_SS): $(SS)
+	$(CC) $(IF) -c serial_tSolver.cu -o $@
 
 

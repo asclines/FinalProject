@@ -41,7 +41,7 @@ struct Helium{
 
 
 struct Silicon{
-	//d_prime => [di+1]
+	//d_prime => d[i+1]
 	__host__ __device__
 	double operator()(double c, double d, double d_prime){
 		double x = c * d_prime;

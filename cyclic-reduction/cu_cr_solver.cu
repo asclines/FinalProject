@@ -14,6 +14,119 @@
 
 
 namespace cyclic_reduction{
+//TODO WIP
+HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c, HVectorD h_vect_d){
+
+	DVectorD d_vect_a,
+		d_vect_b,
+		d_vect_c,
+		d_vect_d,
+		d_vect_x(size),
+		d_vect_a_prime(size),
+		d_vect_c_prime(size);
+
+
+	d_vect_a = h_vect_a;
+	d_vect_b = h_vect_b;
+	d_vect_c = h_vect_c;
+	d_vect_d = h_vect_d;
+
+	InitSolutionDPtrD(size, d_vect_d.data(), d_vect_x.data());
+	
+
+//Foward Reduction Phase
+
+	int level = 1;
+	while(level < size){
+
+	//AlphaBeta Methods
+
+		LowerAlphaBeta(size,level,
+			d_vect_a.data(),
+			d_vect_a_prime.data(),
+			d_vect_b.data()
+		);
+
+		UpperAlphaBeta(size, level,
+			d_vect_b.data(),
+			d_vect_c.data(),
+			d_vect_c_prime.data()
+		);
+
+		
+	//Front Methods
+		
+		MainFront(size, level,
+			d_vect_a_prime.data(),
+			d_vect_b.data(),
+			d_vect_c.data()
+		);
+
+		SolutionFront(size, level,
+			d_vect_a_prime.data(),
+			d_vect_d.data(),
+			d_vect_x.data()
+		);
+
+		LowerFront(size, level,
+			d_vect_a.data(),
+			d_vect_a_prime.data()
+		);
+
+	//Back Methods
+
+		MainBack(size, level,
+			d_vect_a.data(),
+			d_vect_c_prime.data(),
+			d_vect_b.data()
+		);
+
+		SolutionBack(size, level,
+			d_vect_c_prime.data(),
+			d_vect_d.data(),
+			d_vect_x.data()
+		);
+
+		UpperBack(size, level,
+			d_vect_c.data(),
+			d_vect_c_prime.data()
+		);			
+
+	//Set up diagonals for next reduction level
+
+		thrust::copy(
+			d_vect_a.begin(), d_vect_a.end(),
+			d_vect_a_prime.begin()
+		);
+
+		thrust::copy(
+			d_vect_c.begin(), d_vect_c.end(),
+			d_vect_c_prime.begin()
+		);
+
+		thrust::copy(
+			d_vect_d.begin(), d_vect_d.end(),
+			d_vect_x.begin()
+		);
+
+
+
+		level *= 2;
+	}
+
+//Backward Substitution Phase
+		thrust::transform(
+			d_vect_d.begin(), d_vect_d.end(),
+			d_vect_b.begin(),
+			d_vect_d.begin(),
+			thrust::divides<double>()
+		);
+
+	h_vect_d = d_vect_d;
+
+				
+	return h_vect_d;
+}
 
 
 void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b){
@@ -165,19 +278,6 @@ void InitSolutionDPtrD(int n, DPtrD d_ptr_d, DPtrD d_ptr_x){
 
 }//END - namespace
 
-/**
-* Main method to call in order to solve a tridiagonal matrix using Cyclic-Reduction
-*
-* Params:
-*	n - size of diagonals
-* 	vect_* - see diagrams
-**/
-thrust::host_vector<double>  crSolve(int n, thrust::host_vector<double> vect_a, thrust::host_vector<double> vect_b, thrust::host_vector<double> vect_c, thrust::host_vector<double> vect_d){
-
-	n--; //Cause vectors start at 0
-	
-	int q = calc_q(n); //Max reduction level
-}
 
 
 /**

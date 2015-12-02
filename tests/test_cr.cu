@@ -307,7 +307,7 @@ CRCTEST(MainFront){
 	}
 
 }
-/*
+
 CRCTEST(SolutionFront){
 	//Declarations
 	int n = 10;
@@ -373,7 +373,7 @@ CRCTEST(SolutionFront){
 	}
 
 }
-*/
+
 /*
 * ==========Utility Method Tests==========
 */

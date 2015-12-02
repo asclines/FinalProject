@@ -1,22 +1,283 @@
-#include "cu_cr_solver.h"
-#include "cu_cr_internal.h"
-#include "cu_cr_functors.cu"
+#include <cyclic-reduction/cu_cr_solver.h>
+#include <cyclic-reduction/cu_cr_internal.h>
+#include <cyclic-reduction/cu_cr_functors.cu>
 
+#include <cuda.h>
 #include <math.h>
 
-/**
-* Main method to call in order to solve a tridiagonal matrix using Cyclic-Reduction
-*
-* Params:
-*	n - size of diagonals
-* 	vect_* - see diagrams
-**/
-thrust::host_vector<double>  crSolve(int n, thrust::host_vector<double> vect_a, thrust::host_vector<double> vect_b, thrust::host_vector<double> vect_c, thrust::host_vector<double> vect_d){
+#include <thrust/copy.h>
+#include <thrust/functional.h>
 
-	n--; //Cause vectors start at 0
+/*
+* For method documentation see cu_cr_internal.h unless otherwise specified.
+*/
+
+
+namespace cyclic_reduction{
+
+HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c, HVectorD h_vect_d){
+
+	DVectorD d_vect_a,
+		d_vect_b,
+		d_vect_c,
+		d_vect_d,
+		d_vect_x(size),
+		d_vect_a_prime(size),
+		d_vect_c_prime(size);
+
+
+	d_vect_a = h_vect_a;
+	d_vect_b = h_vect_b;
+	d_vect_c = h_vect_c;
+	d_vect_d = h_vect_d;
+
+	InitSolutionDPtrD(size, d_vect_d.data(), d_vect_x.data());
 	
-	int q = calc_q(n); //Max reduction level
+
+//Foward Reduction Phase
+
+	int level = 1;
+	while(level < size){
+
+	//AlphaBeta Methods
+
+		LowerAlphaBeta(size,level,
+			d_vect_a.data(),
+			d_vect_a_prime.data(),
+			d_vect_b.data()
+		);
+
+		UpperAlphaBeta(size, level,
+			d_vect_b.data(),
+			d_vect_c.data(),
+			d_vect_c_prime.data()
+		);
+
+		
+	//Front Methods
+		
+		MainFront(size, level,
+			d_vect_a_prime.data(),
+			d_vect_b.data(),
+			d_vect_c.data()
+		);
+
+		SolutionFront(size, level,
+			d_vect_a_prime.data(),
+			d_vect_d.data(),
+			d_vect_x.data()
+		);
+
+		LowerFront(size, level,
+			d_vect_a.data(),
+			d_vect_a_prime.data()
+		);
+
+	//Back Methods
+
+		MainBack(size, level,
+			d_vect_a.data(),
+			d_vect_c_prime.data(),
+			d_vect_b.data()
+		);
+
+		SolutionBack(size, level,
+			d_vect_c_prime.data(),
+			d_vect_d.data(),
+			d_vect_x.data()
+		);
+
+		UpperBack(size, level,
+			d_vect_c.data(),
+			d_vect_c_prime.data()
+		);			
+
+	//Set up diagonals for next reduction level
+
+		thrust::copy(
+			d_vect_a.begin(), d_vect_a.end(),
+			d_vect_a_prime.begin()
+		);
+
+		thrust::copy(
+			d_vect_c.begin(), d_vect_c.end(),
+			d_vect_c_prime.begin()
+		);
+
+		thrust::copy(
+			d_vect_d.begin(), d_vect_d.end(),
+			d_vect_x.begin()
+		);
+
+
+
+		level *= 2;
+	}
+
+//Backward Substitution Phase
+		thrust::transform(
+			d_vect_d.begin(), d_vect_d.end(),
+			d_vect_b.begin(),
+			d_vect_d.begin(),
+			thrust::divides<double>()
+		);
+
+	h_vect_d = d_vect_d;
+
+				
+	return h_vect_d;
 }
+
+
+void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b){
+
+	InitDPtrD(n,d_ptr_a_prime);
+	thrust::transform(
+		d_ptr_a + level, d_ptr_a + n,
+		d_ptr_b,
+		d_ptr_a_prime + level,
+		AlphaBeta()
+	);
+		
+}
+
+void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
+
+	InitDPtrD(n,d_ptr_c_prime);	
+	thrust::transform(
+		d_ptr_c , d_ptr_c + (n-level),
+		d_ptr_b + level,
+		d_ptr_c_prime,
+		AlphaBeta()
+	);
+
+}
+
+//(rank - span >= 0)
+void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c){
+
+	DVectorD d_vect_temp(n); //TODO see about freeing this memory, and condensing space
+	InitDPtrD(n, d_vect_temp.data());
+	
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_c,
+		d_vect_temp.begin(),
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_b + level, d_ptr_b + n,
+		d_vect_temp.begin(),
+		d_ptr_b + level,
+		thrust::plus<double>()
+	);
+
+}
+
+
+void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x ){
+	DVectorD d_vect_temp(n);
+
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_d + level,
+		d_vect_temp.begin(),
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_x + level, d_ptr_x + n,
+		d_vect_temp.begin(),
+		d_ptr_x + level,
+		thrust::plus<double>()
+	);
+
+}
+
+
+void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
+
+	thrust::transform(
+		d_ptr_a_prime + level, d_ptr_a_prime + n,
+		d_ptr_a_prime + level,
+		d_ptr_a,
+		thrust::multiplies<double>()
+	);	
+}
+
+
+
+//(rank + span < n)
+void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b){
+
+	DVectorD d_vect_temp(n);
+	InitDPtrD(n, d_vect_temp.data());
+	
+	thrust::transform(
+		d_ptr_c_prime , d_ptr_c_prime + (n - level),
+		d_ptr_a + level,
+		d_vect_temp.begin(),
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_b , d_ptr_b + (n - level),
+		d_vect_temp.begin(),
+		d_ptr_b,
+		thrust::plus<double>()
+	);
+}
+
+void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x){
+	DVectorD d_vect_temp(n); 
+	
+	thrust::transform(
+		d_ptr_c_prime, d_ptr_c_prime + (n-level),
+		d_ptr_d + level,
+		d_vect_temp.begin(),
+		thrust::multiplies<double>()
+	);
+
+	thrust::transform(
+		d_ptr_x + level, d_ptr_x + n,
+		d_vect_temp.begin(),
+		d_ptr_x + level,
+		thrust::plus<double>()
+	);
+
+}
+
+
+void UpperBack(int n, int level, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
+
+	thrust::transform(
+		d_ptr_c_prime, d_ptr_c_prime + (n-level),
+		d_ptr_c,
+		d_ptr_c_prime,
+		thrust::multiplies<double>()
+	);	
+}
+
+
+
+/*
+*	Utility Methods
+*/
+
+void InitDPtrD(int n, DPtrD d_ptr){
+	thrust::fill(
+		d_ptr, d_ptr + n,
+		0.00
+	);				
+}
+
+void InitSolutionDPtrD(int n, DPtrD d_ptr_d, DPtrD d_ptr_x){
+	thrust::copy_n(d_ptr_d, n, d_ptr_x);	
+}
+
+}//END - namespace
+
 
 
 /**
@@ -54,7 +315,7 @@ void calc_init(int n,
 		d_ptr_a + 1, d_ptr_a + n,
 		d_ptr_b, 
 		d_vect_alpha.begin(),
-		AlphaBeta()
+		cyclic_reduction::AlphaBeta()
 	);
 
 	thrust::transform(

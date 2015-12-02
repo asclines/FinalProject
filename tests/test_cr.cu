@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 #include <cyclic-reduction/cu_cr_internal.h>
-
+#include <cyclic-reduction/cu_cr_solver.h>
 
 #define CRCTEST(name) \
 	TEST(CyclicReductionCalculationTest,name)	
@@ -19,7 +19,53 @@ using namespace cyclic_reduction;
 * 	Methods are tested in same order they are declared in header files.
 **/
 
+/*
+*	System Test
+*/
 
+
+/*
+*           T *  X   =  D      
+* | 2 3 0 0 |   |x1|   |2|            |-0.909|
+* | 1 3 2 0 | * |x2| = |4|   ==> X ~= | 1.273|
+* | 0 2 4 1 |   |x3|   |6|            | 0.545|
+* | 0 0 3 5 |   |x4|   |8|            | 1.273|
+*/
+TEST(CyclicReductionSystemTest,GeneralCase1){
+	int size = 4;
+
+	HVectorD h_vect_a(size),
+		h_vect_b(size),
+		h_vect_c(size),
+		h_vect_d(size),
+		h_vect_results_actual(size),
+		h_vect_results_expected(size);
+
+	for(int i=0; i<size; i++){
+		h_vect_a[i] = i;
+		h_vect_b[i] = i+2;
+		h_vect_c[i] = size-i-1;
+		h_vect_d[i] = (i+1)*2;	
+	}
+	
+	h_vect_results_actual = Solve(size,
+					h_vect_a,
+					h_vect_b,
+					h_vect_c,
+					h_vect_d
+				);
+
+
+
+
+	for(int i=0; i<size; i++){
+		std::cout<< "x[" << i << "]= " << h_vect_results_actual[i] << std::endl;
+	}
+	
+
+
+
+}
 
 /*
 *	Calculation Method Tests
@@ -53,7 +99,6 @@ CRCTEST(LowerAlphaBeta){
 		} else{
 			h_vect_b[i] = 2.00;
 		}
-
 		//Fill results
 		if(i-level < 0){
 			h_vect_results[i] = 0.00;

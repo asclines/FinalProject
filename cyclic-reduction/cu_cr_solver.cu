@@ -14,7 +14,7 @@
 
 
 namespace cyclic_reduction{
-//TODO WIP
+
 HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c, HVectorD h_vect_d){
 
 	DVectorD d_vect_a,

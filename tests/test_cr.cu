@@ -296,7 +296,7 @@ CRCTEST(MainFront){
 
 //Call method to be tested
 
-
+	//TODO call method
 
 //Copy from device to host 
 	h_vect_b = d_vect_b;
@@ -308,6 +308,7 @@ CRCTEST(MainFront){
 
 }
 
+/*
 CRCTEST(SolutionFront){
 	//Declarations
 	int n = 10;
@@ -373,7 +374,7 @@ CRCTEST(SolutionFront){
 	}
 
 }
-
+*/
 /*
 * ==========Utility Method Tests==========
 */

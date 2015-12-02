@@ -10,11 +10,13 @@ CFLAGS=--std=c++11 -g -G -pg -O0
 OBJDIR = bin/
 CR = cyclic-reduction/
 TEST = tests/
+UTIL = utils/
 
 #Objects
 OBJ_CR = $(OBJDIR)cu_cr_solver.o
+OBJ_UTILS = $(OBJDIR)utils.o
 OBJ_TS = $(OBJDIR)cu_triSolver.o
-OBJS = $(OBJ_CR) 
+OBJS = $(OBJ_CR) $(OBJ_UTILS)
 
 #Thomas Algorithm Serial Method
 TS= cu_triSolver.cu cu_triSolver.h cu_functors.cu
@@ -23,8 +25,13 @@ SD= cu_triSolver.cu cu_triSolver.h cu_functors.cu
 #Cyclic-Reduction Method
 CRM = $(addprefix $(CR), cu_cr_functors.cu cu_cr_solver.cu cu_cr_solver.h cu_cr_internal.h)
 
+#Utility and Helper Files
+UTILS = $(addprefix $(UTIL), utils.cu utils.h) 
+
 #Test Files
 TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu test_functors.cu)
+
+
 #-----RUN COMMANDS-----
 install: init program
 
@@ -53,6 +60,8 @@ test_all: $(TF) $(OBJS)
 
 cr: $(OBJ_CR) 
 
+utils: $(OBJ_UTILS)
+
 
 #-----OBJECT COMMANDS-----
 
@@ -62,6 +71,7 @@ $(OBJ_TS): $(TS)
 $(OBJ_CR): $(CRM)
 	$(CC) $(IF) -c  $(CR)cu_cr_solver.cu $(CFLAGS) -o $@
 
-
+$(OBJ_UTILS): $(UTILS)
+	$(CC) $(IF) -c $(UTIL)utils.cu $(CFLAGS) -o $@
 
 

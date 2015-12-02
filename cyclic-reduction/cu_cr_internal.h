@@ -69,7 +69,6 @@ namespace cyclic_reduction{
 	void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b);
 
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_c_prime
 	 *
 	 * Performs AlphaBeta calculation for all elements in the upper diagonal where the

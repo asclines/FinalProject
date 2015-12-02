@@ -15,7 +15,8 @@ using namespace cyclic_reduction;
 
 /**
 *	This test file holds all tests for unit testing methods for the cyclic-reduction method of
-*	solving tridiagonal matricies
+*	solving tridiagonal matricies.
+* 	Methods are tested in same order they are declared in header files.
 **/
 
 
@@ -26,7 +27,7 @@ using namespace cyclic_reduction;
 
 CRCTEST(LowerAlphaBeta){
 //Declarations
-	int n = 5;
+	int n = 10;
 	int level = 3;
 	
 	HVectorD h_vect_a(n),
@@ -41,7 +42,7 @@ CRCTEST(LowerAlphaBeta){
 //Initialize
 	for(int i =0; i <n; i++){
 		//Fill a
-		h_vect_a[i] = i;
+		h_vect_a[i] = i+1;
 	
 		//Fill a_prime, this is done so there is nonzero data in before
 		h_vect_a_prime[i] = 1000+i;
@@ -62,12 +63,12 @@ CRCTEST(LowerAlphaBeta){
 			h_vect_results[i] = (-h_vect_a[i] / h_vect_b[i-level]);
 		}
 
-		/*
+/*
 		//Print TODO for debugging the test
 		std::cout << "a[" << i << "]= " << h_vect_a[i] << std::endl
 			<< "b[" << i << "]= " << h_vect_b[i] << std::endl
 			<< "results[" << i << "]= " << h_vect_results[i] << std::endl;
-		*/
+*/	
 	}
 
 		
@@ -95,11 +96,76 @@ CRCTEST(LowerAlphaBeta){
 
 
 
+CRCTEST(UpperAlphaBeta){
+//Declarations
+	int n = 10;
+	int level = 2;
+	
+	HVectorD h_vect_c(n),
+		h_vect_c_prime(n),
+		h_vect_b(n),
+		h_vect_results(n);
+	
+	DVectorD d_vect_c(n),
+		d_vect_c_prime(n),
+		d_vect_b(n);
+
+//Initialize
+	for(int i =0; i <n; i++){
+		//Fill a
+		h_vect_c[i] = i+2;
+	
+		//Fill a_prime, this is done so there is nonzero data in before
+		h_vect_c_prime[i] = 1000+i;
+	
+		//Fill b
+		if(i%2 == 0){
+			h_vect_b[i] = 0.00;
+		} else{
+			h_vect_b[i] = 3.00;
+		}
+	}
+	for(int i = 0; i < n; i++){
+		//Fill results
+		if(i+level >= n){
+			h_vect_results[i] = 0.00;
+		} else if(h_vect_b[i+level] == 0.00){
+			h_vect_results[i] = 0.00;
+		} else{
+			h_vect_results[i] = (-h_vect_c[i] / h_vect_b[i+level]);
+		}
+
+/*		
+		//Print TODO for debugging the test
+		std::cout << "a[" << i << "]= " << h_vect_c[i] << std::endl
+			<< "b[" << i << "]= " << h_vect_b[i] << std::endl
+			<< "results[" << i << "]= " << h_vect_results[i] << std::endl;
+*/		
+	}
+
+		
+//Copy from host to device
+	d_vect_c = h_vect_c;
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_b = h_vect_b;
+
+//Call method to be tested
+	UpperAlphaBeta(n,level,
+		d_vect_b.data(),
+		d_vect_c.data(),
+		d_vect_c_prime.data()
+	);
+
+//Copy from device to host 
+	h_vect_c_prime = d_vect_c_prime;
+
+//Check results
+	for(int i=0; i <n; i++){
+		EXPECT_EQ(h_vect_results[i],  h_vect_c_prime[i]);
+	}
 
 
-
-
-
+}
 
 /*
 *		Utility Method Tests

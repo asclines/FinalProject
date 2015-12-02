@@ -38,12 +38,14 @@ install: init program
 run: 
 	./program
 
-test: init test_all
+test: init test_all clean_log
 	./test_all 
 
-clean:
+clean: clean_log
 	@(rm bin/* *.out program test_all) &> /dev/null || true
 
+clean_log:
+	@(rm log.txt) &> /dev/null || true
 clean_objs:
 	@(rm *.o) &> /dev/null || true
 

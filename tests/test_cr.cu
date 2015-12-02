@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include <cyclic-reduction/cu_cr_internal.h>
 #include <cyclic-reduction/cu_cr_solver.h>
+#include <utils/utils.h>
 
 #define CRCTEST(name) \
 	TEST(CyclicReductionCalculationTest,name)	
@@ -47,7 +48,39 @@ TEST(CyclicReductionSystemTest,GeneralCase1){
 		h_vect_c[i] = size-i-1;
 		h_vect_d[i] = (i+1)*2;	
 	}
-	
+
+	h_vect_results_actual = Solve(size,
+					h_vect_a,
+					h_vect_b,
+					h_vect_c,
+					h_vect_d
+				);
+/*
+	utils::PrintVector(true,"A",h_vect_a);
+	utils::PrintVector(true,"B",h_vect_b);
+	utils::PrintVector(true,"C",h_vect_c);
+	utils::PrintVector(true,"D",h_vect_d);
+	utils::PrintVector(true,"X",h_vect_results_actual);
+*/
+
+}
+
+TEST(CyclicReductionSystemTest, GeneralCase2){
+	int size = 4;
+
+	HVectorD h_vect_a(size),
+		h_vect_b(size),
+		h_vect_c(size),
+		h_vect_d(size),
+		h_vect_results_actual(size),
+		h_vect_results_expected(size);
+
+	for(int i=0; i<size; i++){
+		h_vect_a[i] = 1;
+		h_vect_b[i] = 1;
+		h_vect_c[i] = 1;
+		h_vect_d[i] = 1;	
+	}
 	h_vect_results_actual = Solve(size,
 					h_vect_a,
 					h_vect_b,
@@ -55,17 +88,17 @@ TEST(CyclicReductionSystemTest,GeneralCase1){
 					h_vect_d
 				);
 
+	utils::PrintVector(true,"A",h_vect_a);
+	utils::PrintVector(true,"B",h_vect_b);
+	utils::PrintVector(true,"C",h_vect_c);
+	utils::PrintVector(true,"D",h_vect_d);
+	utils::PrintVector(true,"X",h_vect_results_actual);
 
 
-
-	for(int i=0; i<size; i++){
-		std::cout<< "x[" << i << "]= " << h_vect_results_actual[i] << std::endl;
-	}
 	
-
-
-
 }
+
+
 
 /*
 *	Calculation Method Tests

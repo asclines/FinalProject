@@ -9,6 +9,7 @@ void PrintVector(std::string name, HostD vector){
 	for(int i=0; i <vector.size(); i++){
 		std::cout << name << "[" << i << "]= " << vector[i] << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 
@@ -21,7 +22,7 @@ void PrintVector(std::string name, DeviceD d_vector){
 
 void PrintVector(bool log, std::string name, HostD vector){
 	if(log){
-		std::ofstream out(LOG_FILE);
+		std::ofstream out(LOG_FILE,std::ios::out | std::ios::app);
 		if(out.is_open()){
 			std::streambuf *old_buffer = std::cout.rdbuf();
 			std::cout.rdbuf(out.rdbuf());
@@ -29,6 +30,7 @@ void PrintVector(bool log, std::string name, HostD vector){
 			PrintVector(name,vector);
 	
 			std::cout.rdbuf(old_buffer);
+			out.close();
 		} else{
 			std::cout << "Could not open log file" << std::endl;
 		}
@@ -39,7 +41,7 @@ void PrintVector(bool log, std::string name, HostD vector){
 
 void Log(std::string text){
 
-	std::ofstream out(LOG_FILE);
+	std::ofstream out(LOG_FILE, std::ios::out | std::ios::app);
 	if(out.is_open()){
 		out << text << "\n";
 		out.close();

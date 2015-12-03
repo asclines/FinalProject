@@ -181,7 +181,7 @@ void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
-		d_ptr_d + level,
+		d_ptr_d,
 		d_vect_temp.begin(),
 		thrust::multiplies<double>()
 	);

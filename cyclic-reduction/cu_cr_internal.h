@@ -78,7 +78,6 @@ namespace cyclic_reduction{
 	void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime);
 	
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_d
 	 *
  	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position

@@ -265,7 +265,7 @@ CRCTEST(MainFront){
 		//Fill a_prime
 		h_vect_a_prime[i] = i+1;
 	
-		//Fill the initial values of v
+		//Fill the initial values of b
 		h_vect_b[i] = i;
 	
 		//Fill c
@@ -295,9 +295,14 @@ CRCTEST(MainFront){
 	d_vect_c = h_vect_c;
 
 //Call method to be tested
+	MainFront(n,level,
+		d_vect_a_prime.data(),
+		d_vect_b.data(),
+		d_vect_c.data()
+	);
 
-	//TODO call method
 
+	
 //Copy from device to host 
 	h_vect_b = d_vect_b;
 
@@ -308,8 +313,75 @@ CRCTEST(MainFront){
 
 }
 
-/*
+
 CRCTEST(SolutionFront){
+	//Declarations
+	int n = 10;
+	int level = 4;
+	
+	HVectorD h_vect_a_prime(n),
+		h_vect_d(n),
+		h_vect_x(n),
+		h_vect_results(n);
+	
+	DVectorD d_vect_a_prime(n),
+		d_vect_d(n),
+		d_vect_x(n);
+
+//Initialize
+	for(int i =0; i <n; i++){
+		//Fill a_prime
+		h_vect_a_prime[i] = i+1;
+	
+		//Fill the initial values of X
+		h_vect_x[i] = i+3;
+	
+		//Fill D
+		h_vect_d[i] = i+2;
+	}
+
+	//Fill results	
+	for(int i = 0; i < n; i++){
+		if(i-level >= 0){
+			h_vect_results[i] = h_vect_x[i] + (h_vect_a_prime[i] * h_vect_d[i-level]);
+		} else{
+			h_vect_results[i] = h_vect_x[i];
+		}	
+	}
+/*
+	utils::PrintVector(true,"A'",h_vect_a_prime);
+	utils::PrintVector(true,"D",h_vect_d);
+	utils::PrintVector(true,"X",h_vect_x);
+	utils::PrintVector(true,"Results",h_vect_results);
+*/
+
+
+		
+//Copy from host to device
+	d_vect_a_prime = h_vect_a_prime;
+	d_vect_d = h_vect_d;
+	d_vect_x = h_vect_x;
+
+//Call method to be tested
+	SolutionFront(n,level,
+		d_vect_a_prime.data(),
+		d_vect_d.data(),
+		d_vect_x.data()
+	);
+
+
+//Copy from device to host 
+	h_vect_x = d_vect_x;
+
+//Check results
+	for(int i=0; i <n; i++){
+		EXPECT_EQ(h_vect_results[i],  h_vect_x[i]);
+	}
+
+}
+
+//TODO WIP
+CRCTEST(LowerFront){
 	//Declarations
 	int n = 10;
 	int level = 4;
@@ -358,7 +430,7 @@ CRCTEST(SolutionFront){
 	d_vect_x = h_vect_x;
 
 //Call method to be tested
-	MainFront(n,level,
+	SolutionFront(n,level,
 		d_vect_a_prime.data(),
 		d_vect_d.data(),
 		d_vect_x.data()
@@ -366,15 +438,15 @@ CRCTEST(SolutionFront){
 
 
 //Copy from device to host 
-	h_vect_b = d_vect_b;
+	h_vect_x = d_vect_x;
 
 //Check results
 	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_b[i]);
+		EXPECT_EQ(h_vect_results[i],  h_vect_x[i]);
 	}
 
 }
-*/
+
 /*
 * ==========Utility Method Tests==========
 */

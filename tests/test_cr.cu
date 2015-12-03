@@ -34,7 +34,7 @@ protected:
 	static void SetUpTestCase(){
 		n = 10;
 		level = 4;
-
+/*
 		SetupHVectorD(&h_vect_a,2);
 		SetupHVectorD(&h_vect_b,4);
 		SetupHVectorD(&h_vect_c,2);
@@ -43,6 +43,8 @@ protected:
 
 		SetupHVectorD(&h_vect_a_prime,6);		
 		SetupHVectorD(&h_vect_c_prime,5);
+*/
+		GenVectors();
 	}
 
 	virtual void SetUp(){
@@ -82,12 +84,23 @@ protected:
 		d_vect_c_prime;
 
 //Protected Methods
+	void LogResults(std::string name){
+		LogVector(name+":Actual",h_vect_results_a);
+		LogVector(name+":Expected",h_vect_results_e);
+	}
+
 	void CheckResults(){
 		for(int i = 0; i < n; i++){
 			EXPECT_EQ(h_vect_results_e[i],h_vect_results_a[i]);
 		}
 	}
-	
+
+	void LogVectors(std::string name){
+		LogVector(name+":A",h_vect_a);
+		
+		LogVector(name+":A'", h_vect_a_prime);
+	}	
+
 	void LogVector(std::string name, HVectorD vector){
 		utils::PrintVector(true,
 			case_name + "." + test_name + ":" + name,
@@ -95,16 +108,39 @@ protected:
 		);
 	}
 
-	void CheckVectors(HVectorD *expected, HVectorD *actual){
+/*	void CheckVectors(HVectorD *expected, HVectorD *actual){
 		for(int i = 0; i < n; i++){
 			EXPECT_EQ( (*expected)[i] , (*actual)[i] );
 		}	
 	}
-
+*/
 
 private:
+	static void GenVectors(){
+		h_vect_a.resize(n,0.00);
+		h_vect_b.resize(n,0.00);
+		h_vect_c.resize(n,0.00);
+		h_vect_d.resize(n,0.00);
+		h_vect_x.resize(n,0.00);
+		h_vect_a_prime.resize(n,0.00);
+		h_vect_c_prime.resize(n,0.00);
+
+		for(int i = 0; i < n; i++){
+			// A B C D X A' C'
+			h_vect_a[i] = i+1;
+			h_vect_b[i] = i+1;
+			h_vect_c[i] = i+2;
+			h_vect_d[i] = i+3;
+			h_vect_x[i] = i+4;
+
+			h_vect_a_prime[i] = i+2;
+			h_vect_c_prime[i] = i;
+		}
+	}
+
 	static void SetupHVectorD(HVectorD *vector, int start){
 		vector->resize(n,0.00);
+		
 		thrust::sequence(vector->begin(),vector->end(),start);
 	}
 };
@@ -189,7 +225,7 @@ TESTCRC(UpperAlphaBeta){
 
 	h_vect_results_a = d_vect_c_prime;
 
-	LogVector("Actual",h_vect_results_a);
+	//LogVector("Actual",h_vect_results_a);
 	CheckResults();
 }
 
@@ -254,6 +290,35 @@ TESTCRC(SolutionFront){
 	CheckResults();
 }
 
+TESTCRC(LowerFront){
+
+//Fill results	
+	for(int i = 0; i < n; i++){
+		if(i-level >= 0){
+			h_vect_results_e[i] = h_vect_a_prime[i] * h_vect_a[i-level]; 
+		} else{
+			h_vect_results_e[i] = h_vect_a_prime[i];
+		}	
+	}
+		
+//Copy from host to device
+	d_vect_a = h_vect_a;
+	d_vect_a_prime = h_vect_a_prime;
+
+//Call method to be tested
+	LowerFront(n,level,
+		d_vect_a.data(),
+		d_vect_a_prime.data()
+	);	
+
+//Copy from device to host 
+	h_vect_results_a = d_vect_a_prime;
+		
+	LogVectors("LowerFrontTest");
+	LogResults("LowerFrontTest");
+	CheckResults();
+}
+
 
 
 /*
@@ -292,6 +357,11 @@ TEST(CyclicReductionSystemTest,GeneralCase1){
 					h_vect_d
 				);
 
+	utils::PrintVector(true,
+		"System.Case1:Actual",
+		h_vect_results_actual 
+		);
+
 }
 
 TEST(CyclicReductionSystemTest, GeneralCase2){
@@ -323,69 +393,6 @@ TEST(CyclicReductionSystemTest, GeneralCase2){
 /*
 *	Calculation Method Tests
 */
-//TODO WIP
-CRCTEST(LowerFront){
-	//Declarations
-	int n = 10;
-	int level = 4;
-	
-	HVectorD h_vect_a_prime(n),
-		h_vect_d(n),
-		h_vect_x(n),
-		h_vect_results(n);
-	
-	DVectorD d_vect_a_prime(n),
-		d_vect_d(n),
-		d_vect_x(n);
-
-//Initialize
-	for(int i =0; i <n; i++){
-		//Fill a_prime
-		h_vect_a_prime[i] = i+1;
-	
-		//Fill the initial values of X
-		h_vect_x[i] = i+3;
-	
-		//Fill D
-		h_vect_d[i] = i+2;
-	}
-
-	//Fill results	
-	for(int i = 0; i < n; i++){
-		if(i-level >= 0){
-			h_vect_results[i] = h_vect_x[i] + (h_vect_a_prime[i] * h_vect_d[i-level]);
-		} else{
-			h_vect_results[i] = h_vect_x[i];
-		}	
-	}
-
-
-
-
-		
-//Copy from host to device
-	d_vect_a_prime = h_vect_a_prime;
-	d_vect_d = h_vect_d;
-	d_vect_x = h_vect_x;
-
-//Call method to be tested
-	SolutionFront(n,level,
-		d_vect_a_prime.data(),
-		d_vect_d.data(),
-		d_vect_x.data()
-	);
-
-
-//Copy from device to host 
-	h_vect_x = d_vect_x;
-
-//Check results
-	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_x[i]);
-	}
-
-}
-
 /*
 * ==========Utility Method Tests==========
 */

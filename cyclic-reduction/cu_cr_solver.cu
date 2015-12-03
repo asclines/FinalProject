@@ -200,8 +200,8 @@ void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
-		d_ptr_a_prime + level,
 		d_ptr_a,
+		d_ptr_a_prime + level,
 		thrust::multiplies<double>()
 	);	
 }

@@ -88,7 +88,6 @@ namespace cyclic_reduction{
 	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
 
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_x
 	 *
 	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position

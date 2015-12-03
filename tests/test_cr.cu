@@ -38,7 +38,8 @@ protected:
 		SetupHVectorD(&h_vect_a,2);
 		SetupHVectorD(&h_vect_b,4);
 		SetupHVectorD(&h_vect_c,2);
-//		SetupHVectorD(&h_vect_d,3);	
+		SetupHVectorD(&h_vect_d,3);	
+		SetupHVectorD(&h_vect_x,2);
 
 		SetupHVectorD(&h_vect_a_prime,6);		
 		SetupHVectorD(&h_vect_c_prime,5);
@@ -54,11 +55,12 @@ protected:
 	std::string test_name = "N/A";
 	static int n,level;
 	
-	//Host vectors for the matrix diagonals of matrix T and the column matrix D;
+	//Host vectors for the matrix diagonals of matrix T and the column matrices D and X
 	static HVectorD h_vect_a,
 			h_vect_b,
 			h_vect_c,
-			h_vect_d;
+			h_vect_d,
+			h_vect_x;
 
 	//Host vectors for calculation results
 	static HVectorD h_vect_a_prime,
@@ -68,11 +70,12 @@ protected:
 	HVectorD h_vect_results_e; //Expected result
 	HVectorD h_vect_results_a; //Actual result
 
-	//Device vectors for the matrix diagonals of matrix T and column matrix D
+	//Device vectors for the matrix diagonals of matrix T and column matrices D and X
 	DVectorD d_vect_a,
 		d_vect_b,
 		d_vect_c,
-		d_vect_d;
+		d_vect_d,
+		d_vect_x;
 
 	//Device vectors for the calculation results
 	DVectorD d_vect_a_prime,
@@ -115,7 +118,8 @@ int CyclicReductionTest::n = 0,CyclicReductionTest::level = 0;
 HVectorD CyclicReductionTest::h_vect_a,
 	CyclicReductionTest::h_vect_b,
 	CyclicReductionTest::h_vect_c,
-	CyclicReductionTest::h_vect_d;
+	CyclicReductionTest::h_vect_d,
+	CyclicReductionTest::h_vect_x;
 
 
 HVectorD CyclicReductionTest::h_vect_a_prime,
@@ -220,38 +224,13 @@ TESTCRC(MainFront){
 	CheckResults();
 }
 
-CRCTEST(SolutionFront){
-	//Declarations
-	int n = 10;
-	int level = 4;
-	
-	HVectorD h_vect_a_prime(n),
-		h_vect_d(n),
-		h_vect_x(n),
-		h_vect_results(n);
-	
-	DVectorD d_vect_a_prime(n),
-		d_vect_d(n),
-		d_vect_x(n);
-
-//Initialize
-	for(int i =0; i <n; i++){
-		//Fill a_prime
-		h_vect_a_prime[i] = i+1;
-	
-		//Fill the initial values of X
-		h_vect_x[i] = i+3;
-	
-		//Fill D
-		h_vect_d[i] = i+2;
-	}
-
-	//Fill results	
+TESTCRC(SolutionFront){
+//Fill results	
 	for(int i = 0; i < n; i++){
 		if(i-level >= 0){
-			h_vect_results[i] = h_vect_x[i] + (h_vect_a_prime[i] * h_vect_d[i-level]);
+			h_vect_results_e[i] = h_vect_x[i] + (h_vect_a_prime[i] * h_vect_d[i-level]);
 		} else{
-			h_vect_results[i] = h_vect_x[i];
+			h_vect_results_e[i] = h_vect_x[i];
 		}	
 	}
 
@@ -270,13 +249,9 @@ CRCTEST(SolutionFront){
 
 
 //Copy from device to host 
-	h_vect_x = d_vect_x;
+	h_vect_results_a = d_vect_x;
 
-//Check results
-	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_x[i]);
-	}
-
+	CheckResults();
 }
 
 

@@ -253,7 +253,7 @@ void UpperBack(int n, int level, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
 
 	thrust::transform(
 		d_ptr_c_prime, d_ptr_c_prime + (n-level),
-		d_ptr_c,
+		d_ptr_c + level,
 		d_ptr_c_prime,
 		thrust::multiplies<double>()
 	);	

@@ -34,16 +34,6 @@ protected:
 	static void SetUpTestCase(){
 		n = 10;
 		level = 4;
-/*
-		SetupHVectorD(&h_vect_a,2);
-		SetupHVectorD(&h_vect_b,4);
-		SetupHVectorD(&h_vect_c,2);
-		SetupHVectorD(&h_vect_d,3);	
-		SetupHVectorD(&h_vect_x,2);
-
-		SetupHVectorD(&h_vect_a_prime,6);		
-		SetupHVectorD(&h_vect_c_prime,5);
-*/
 		GenVectors();
 	}
 
@@ -53,8 +43,6 @@ protected:
 	}
 	
 //Protected Data Members
-	std::string case_name = "N/A";
-	std::string test_name = "N/A";
 	static int n,level;
 	
 	//Host vectors for the matrix diagonals of matrix T and the column matrices D and X
@@ -128,12 +116,12 @@ private:
 			// A B C D X A' C'
 			h_vect_a[i] = i+1;
 			h_vect_b[i] = i+2;
-			h_vect_c[i] = i+2;
+			h_vect_c[i] = i+1;
 			h_vect_d[i] = i+2;
 			h_vect_x[i] = i+3;
 
 			h_vect_a_prime[i] = i+1;
-			h_vect_c_prime[i] = i+1;
+			h_vect_c_prime[i] = i+2;
 		}
 	}
 
@@ -369,11 +357,32 @@ TESTCRC(SolutionBack){
 	h_vect_results_a = d_vect_x;
 
 	CheckResults();
+}
 
+TESTCRC(UpperBack){
 
-	LogVectors("SolutionBackTest");
-	LogResults("SolutionBackTest");
+	for(int i = 0; i < n; i++){
+		if(i+level < n){
+			h_vect_results_e[i] = h_vect_c_prime[i] * h_vect_c[i+level];
+		} else{
+			h_vect_results_e[i] = h_vect_c_prime[i];
+		}
+	}
 
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_c = h_vect_c;
+
+	UpperBack(n,level,
+		d_vect_c.data(),
+		d_vect_c_prime.data()
+	);
+
+	h_vect_results_a = d_vect_c_prime;
+
+	LogVectors("UpperBackTest");
+	LogResults("UpperBackTest");
+
+	CheckResults();
 
 }
 

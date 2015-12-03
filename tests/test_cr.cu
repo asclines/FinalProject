@@ -108,7 +108,7 @@ protected:
 
 	void LogVector(std::string name, HVectorD vector){
 		utils::PrintVector(true,
-			case_name + "." + test_name + ":" + name,
+			 name,
 			vector 
 		);
 	}
@@ -129,11 +129,11 @@ private:
 			h_vect_a[i] = i+1;
 			h_vect_b[i] = i+2;
 			h_vect_c[i] = i+2;
-			h_vect_d[i] = i+3;
-			h_vect_x[i] = i+4;
+			h_vect_d[i] = i+2;
+			h_vect_x[i] = i+3;
 
 			h_vect_a_prime[i] = i+1;
-			h_vect_c_prime[i] = i+3;
+			h_vect_c_prime[i] = i+1;
 		}
 	}
 
@@ -343,15 +343,39 @@ TESTCRC(MainBack){
 //Copy from device to host
 	h_vect_results_a = d_vect_b;
 
-	LogVectors("MainBackTest");
-	LogResults("MainBackTest");
+	CheckResults();
+}
+
+TESTCRC(SolutionBack){
+
+	for(int i = 0; i < n; i++){
+		if(i+level < n){
+			h_vect_results_e[i] = h_vect_x[i] + ( h_vect_c_prime[i] * h_vect_d[i+level] );		
+		} else{
+			h_vect_results_e[i] = h_vect_x[i];
+		}
+	}
+
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_d = h_vect_d;
+	d_vect_x = h_vect_x;
+
+	SolutionBack(n,level,
+		d_vect_c_prime.data(),
+		d_vect_d.data(),
+		d_vect_x.data()
+	);
+
+	h_vect_results_a = d_vect_x;
 
 	CheckResults();
 
 
+	LogVectors("SolutionBackTest");
+	LogResults("SolutionBackTest");
+
 
 }
-
 
 /*
 *	System Test

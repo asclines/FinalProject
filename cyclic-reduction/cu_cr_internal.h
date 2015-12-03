@@ -105,7 +105,6 @@ namespace cyclic_reduction{
 
 
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_c
 	 *
 	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation of the 

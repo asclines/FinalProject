@@ -240,9 +240,9 @@ void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_
 	);
 
 	thrust::transform(
-		d_ptr_x + level, d_ptr_x + n,
+		d_ptr_x , d_ptr_x + (n-level),
 		d_vect_temp.begin(),
-		d_ptr_x + level,
+		d_ptr_x,
 		thrust::plus<double>()
 	);
 

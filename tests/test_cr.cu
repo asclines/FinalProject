@@ -96,9 +96,14 @@ protected:
 	}
 
 	void LogVectors(std::string name){
-		LogVector(name+":A",h_vect_a);
-		
+		LogVector(name+":A",h_vect_a);	
+		LogVector(name+":B",h_vect_b);
+		LogVector(name+":C",h_vect_c);
+		LogVector(name+":D",h_vect_d);
+		LogVector(name+":X",h_vect_x);
+	
 		LogVector(name+":A'", h_vect_a_prime);
+		LogVector(name+":C'", h_vect_c_prime);
 	}	
 
 	void LogVector(std::string name, HVectorD vector){
@@ -108,12 +113,6 @@ protected:
 		);
 	}
 
-/*	void CheckVectors(HVectorD *expected, HVectorD *actual){
-		for(int i = 0; i < n; i++){
-			EXPECT_EQ( (*expected)[i] , (*actual)[i] );
-		}	
-	}
-*/
 
 private:
 	static void GenVectors(){
@@ -128,13 +127,13 @@ private:
 		for(int i = 0; i < n; i++){
 			// A B C D X A' C'
 			h_vect_a[i] = i+1;
-			h_vect_b[i] = i+1;
+			h_vect_b[i] = i+2;
 			h_vect_c[i] = i+2;
 			h_vect_d[i] = i+3;
 			h_vect_x[i] = i+4;
 
-			h_vect_a_prime[i] = i+2;
-			h_vect_c_prime[i] = i;
+			h_vect_a_prime[i] = i+1;
+			h_vect_c_prime[i] = i+3;
 		}
 	}
 
@@ -314,11 +313,44 @@ TESTCRC(LowerFront){
 //Copy from device to host 
 	h_vect_results_a = d_vect_a_prime;
 		
-	LogVectors("LowerFrontTest");
-	LogResults("LowerFrontTest");
 	CheckResults();
 }
 
+
+TESTCRC(MainBack){
+
+//Fill results
+	for(int i = 0; i < n; i++){
+		if(i+level < n){
+			h_vect_results_e[i] = h_vect_b[i] + (h_vect_c_prime[i] * h_vect_a[i+level]);
+		} else{
+			h_vect_results_e[i] = h_vect_b[i];
+		}
+	}
+
+//Copy from host to device
+	d_vect_a = h_vect_a;
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_b = h_vect_b;
+
+//Call method to be tested
+	MainBack(n, level,
+		d_vect_a.data(),
+		d_vect_c_prime.data(),
+		d_vect_b.data()
+	);
+
+//Copy from device to host
+	h_vect_results_a = d_vect_b;
+
+	LogVectors("MainBackTest");
+	LogResults("MainBackTest");
+
+	CheckResults();
+
+
+
+}
 
 
 /*

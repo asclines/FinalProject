@@ -97,7 +97,6 @@ namespace cyclic_reduction{
 	void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
 
 	/*
- 	 * TODO needs testing
  	 * Modifies d_ptr_a_prime
  	 *
  	 * Multiples each qualifying element in the lower diagonal by its AlphaBeta calculation
@@ -107,7 +106,7 @@ namespace cyclic_reduction{
 
 	/*
 	 * TODO needs testing
-	 * Modifies d_ptr_d
+	 * Modifies d_ptr_c
 	 *
 	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation of the 
 	 * element at the same position in the upper diagonal with neighboring lower element.

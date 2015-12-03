@@ -6,6 +6,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/iterator/counting_iterator.h>
+#include <thrust/sequence.h>
 
 /*
  * 	This header file contains all foward declarations of methods used internall by

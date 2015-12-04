@@ -6,7 +6,6 @@
 #define CRSTEST(name) \
 	TEST_F(CyclicReductionSolverTest,name)
 
-
 /**
 *	This test file holds all the tests for black box testing methods for the cyclic-reduction method
 * 	of solving tridiagonal matricies
@@ -27,6 +26,7 @@ protected:
 //Protected Data Members
 	int n;
 	std::string name;	
+
 	//Host vectors for the matrix diagonals of matrix T and the column matrix D
 	HVectorD h_vect_a,
 		h_vect_b,
@@ -64,8 +64,6 @@ protected:
 			
 		LogResults();
 		CheckResults();
-			
-
 	}
 
 	void LogResults(){
@@ -126,8 +124,6 @@ protected:
 CRSTEST(GeneralCase1){
 	InitTest("GeneralCase1",5);
 	
-	
-	
 	for(int i=0; i<n; i++){
 		h_vect_a[i] = i+1;
 		h_vect_b[i] = i+2;
@@ -142,7 +138,34 @@ CRSTEST(GeneralCase1){
 	h_vect_results_e[4] = 0.80645161290323; 
 		
 	Test();	
-	
-
-
 }
+
+
+CRSTEST(GeneralCase2){
+	InitTest("GeneralCase2",10);
+	
+	for(int i=0; i<n; i++){
+		h_vect_a[i] = i+40.2;
+		h_vect_b[i] = i+351.345;
+		h_vect_c[i] = i* 34.523;
+		h_vect_d[i] = (i+34.234)*2;	
+	}
+	
+	h_vect_results_e[0] = 0.19487398426048;
+	h_vect_results_e[1] = 0.16192025637815;
+	h_vect_results_e[2] = 0.15605246111026;
+	h_vect_results_e[3] = 0.15199444297771;
+	h_vect_results_e[4] = 0.13390167697961;
+	h_vect_results_e[5] = 0.16053467408732;
+	h_vect_results_e[6] = 0.088114681591252;
+	h_vect_results_e[7] = 0.20065829139964;
+	h_vect_results_e[8] = 0.026500310754682;
+	h_vect_results_e[9] = 0.23634068659443; 
+		
+	Test();	
+}
+
+
+
+
+

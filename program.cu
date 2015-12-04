@@ -7,6 +7,7 @@
 #include <utils/utils.h>
 #include <cyclic-reduction/cu_cr_solver.h>
 #include <thrust/host_vector.h>
+#include <serial_tSolver.h>
 
 using namespace std;
 
@@ -105,14 +106,14 @@ int main(int argc, const char *argv[]){
 			
 			utils::LogProgramResults("Cyclic Reduction Method Results",h_vect_results);
 		}
+		else{
+			h_vect_results = serial_solve(n, h_vect_a, h_vect_b, h_vect_c, h_vect_d);
+			utils::LogProgramResults("Thomas Algorithm Method Results", h_vect_results);
+		}	
 
-		//utils::PrintVector(true,"X",h_vect_results);
 
 	}
 	else cout <<"Unable to open file";
-
-
-
 
 	return 0;
 }

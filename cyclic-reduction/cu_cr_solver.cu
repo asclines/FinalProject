@@ -21,9 +21,9 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 		d_vect_b,
 		d_vect_c,
 		d_vect_d,
-		d_vect_x(size),
-		d_vect_a_prime(size),
-		d_vect_c_prime(size);
+		d_vect_x(size,0.00),
+		d_vect_a_prime(size,0.00),
+		d_vect_c_prime(size,0.00);
 
 
 	d_vect_a = h_vect_a;
@@ -31,7 +31,7 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 	d_vect_c = h_vect_c;
 	d_vect_d = h_vect_d;
 
-	InitSolutionDPtrD(size, d_vect_d.data(), d_vect_x.data());
+//	InitSolutionDPtrD(size, d_vect_d.data(), d_vect_x.data());
 	
 
 //Foward Reduction Phase
@@ -53,7 +53,9 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 			d_vect_c_prime.data()
 		);
 
-		
+	
+		d_vect_x = d_vect_d;
+	
 	//Front Methods
 		
 		MainFront(size, level,
@@ -93,7 +95,10 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 		);			
 
 	//Set up diagonals for next reduction level
-
+		d_vect_a = d_vect_a_prime;
+		d_vect_c = d_vect_c_prime;
+		d_vect_d = d_vect_x;
+/*
 		thrust::copy(
 			d_vect_a.begin(), d_vect_a.end(),
 			d_vect_a_prime.begin()
@@ -109,21 +114,22 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 			d_vect_x.begin()
 		);
 
-
+*/
 
 		level *= 2;
 	}
 
 //Backward Substitution Phase
+	DVectorD d_vect_results(size);
 		thrust::transform(
 			d_vect_d.begin(), d_vect_d.end(),
 			d_vect_b.begin(),
-			d_vect_d.begin(),
+			d_vect_results.begin(),
 			thrust::divides<double>()
 		);
 
-	h_vect_d = d_vect_d;
-
+	h_vect_d = d_vect_results;
+	
 				
 	return h_vect_d;
 }
@@ -181,7 +187,7 @@ void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
-		d_ptr_d + level,
+		d_ptr_d,
 		d_vect_temp.begin(),
 		thrust::multiplies<double>()
 	);
@@ -200,8 +206,8 @@ void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
-		d_ptr_a_prime + level,
 		d_ptr_a,
+		d_ptr_a_prime + level,
 		thrust::multiplies<double>()
 	);	
 }
@@ -240,9 +246,9 @@ void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_
 	);
 
 	thrust::transform(
-		d_ptr_x + level, d_ptr_x + n,
+		d_ptr_x , d_ptr_x + (n-level),
 		d_vect_temp.begin(),
-		d_ptr_x + level,
+		d_ptr_x,
 		thrust::plus<double>()
 	);
 
@@ -253,7 +259,7 @@ void UpperBack(int n, int level, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
 
 	thrust::transform(
 		d_ptr_c_prime, d_ptr_c_prime + (n-level),
-		d_ptr_c,
+		d_ptr_c + level,
 		d_ptr_c_prime,
 		thrust::multiplies<double>()
 	);	

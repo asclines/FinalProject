@@ -7,6 +7,7 @@ IF = -I ./
 CFLAGS=--std=c++11 -g -G -pg -O0
 
 #Locations
+EXEDIR = gen/
 OBJDIR = bin/
 CR = cyclic-reduction/
 TEST = tests/
@@ -31,36 +32,36 @@ CRM = $(addprefix $(CR), cu_cr_functors.cu cu_cr_solver.cu cu_cr_solver.h cu_cr_
 UTILS = $(addprefix $(UTIL), utils.cu utils.h) 
 
 #Test Files
-TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu test_functors.cu test_serial_tSolver.cu)
+TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu test_functors.cu test_serial_tSolver.cu test_cr_system.cu)
 
 
 #-----RUN COMMANDS-----
 install: init program
 
-run: 
-	./program
+run: init
+	./$(EXEDIR)program p
 
-test: init test_all clean_log
-	./test_all 
+test: init test_all
+	./$(EXEDIR)test_all 
 
 clean: clean_log
-	@(rm bin/* *.out program test_all) &> /dev/null || true
+	@(rm bin/* gen/* *.out program test_all) &> /dev/null || true
 
 clean_log:
-	@(rm log.txt) &> /dev/null || true
+	@(rm output.txt log.txt) &> /dev/null || true
 clean_objs:
 	@(rm *.o) &> /dev/null || true
 
 #-----MAKE COMMANDS-----
 
-init: 
-	@(mkdir bin) &> /dev/null || true
+init: clean_log 
+	@(mkdir bin gen) &> /dev/null || true
 
 program: triSolver.cu $(OBJS)
-	$(CC) $(IF) $(OBJS)-o program triSolver.cu
+	$(CC) $(IF) $(OBJS) -o $(EXEDIR)program triSolver.cu 
 
 test_all: $(TF) $(OBJS)
-	$(CC) $(IF) $(OBJS)  -o test_all $(TEST)test_all.cu $(LIBS) $(CFLAGS)
+	$(CC) $(IF) $(OBJS)  -o $(EXEDIR)test_all $(TEST)test_all.cu $(LIBS) $(CFLAGS) 
 
 cr: $(OBJ_CR)
 

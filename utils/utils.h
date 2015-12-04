@@ -19,7 +19,7 @@ void PrintVector(bool toLogFile, std::string vector_name, HostD vector);
 void PrintVector(std::string vector_name, HostD vector);
 void PrintVector(std::string vector_name, DeviceD vector);
 
-
+void LogProgramResults(std::string name,HostD vector);
 void Log(std::string text);
 
 

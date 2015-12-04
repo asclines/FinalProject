@@ -6,6 +6,7 @@
 #include <thrust/host_vector.h>
 #include <thrust/iterator/zip_iterator.h>
 #include <thrust/iterator/counting_iterator.h>
+#include <thrust/sequence.h>
 
 /*
  * 	This header file contains all foward declarations of methods used internall by
@@ -78,7 +79,6 @@ namespace cyclic_reduction{
 	void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime);
 	
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_d
 	 *
  	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position
@@ -88,7 +88,6 @@ namespace cyclic_reduction{
 	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
 
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_x
 	 *
 	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position
@@ -98,7 +97,6 @@ namespace cyclic_reduction{
 	void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
 
 	/*
- 	 * TODO needs testing
  	 * Modifies d_ptr_a_prime
  	 *
  	 * Multiples each qualifying element in the lower diagonal by its AlphaBeta calculation
@@ -107,8 +105,7 @@ namespace cyclic_reduction{
 
 
 	/*
-	 * TODO needs testing
-	 * Modifies d_ptr_d
+	 * Modifies d_ptr_c
 	 *
 	 * Multiples each qualifying element in the main diagonal by the AlphaBeta calculation of the 
 	 * element at the same position in the upper diagonal with neighboring lower element.
@@ -118,7 +115,6 @@ namespace cyclic_reduction{
 	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
 
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_x
 	 *
 	 * Adds the result of multiplying the AlphaBeta calculation of the element at the same position in the 
@@ -129,7 +125,6 @@ namespace cyclic_reduction{
 
 	
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_c_prime
 	 *
 	 * Multiples AlphaBeta calculation of qualifying elements in upper diagonal by neighbor element in 

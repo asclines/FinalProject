@@ -4,10 +4,42 @@
 #include "cu_triSolver.h"
 #include <vector>
 #include <sstream>
+#include <utils/utils.h>
+#include <cyclic-reduction/cu_cr_solver.h>
+#include <thrust/host_vector.h>
 
 using namespace std;
 
-int main(){
+void usage(){
+
+	cout << "usage: ./program [option]"
+		<< endl << endl
+		<< "p \t run parallel method" << endl
+		<< "s \t run serial method" << endl;
+}
+
+int main(int argc, const char *argv[]){
+	typedef thrust::host_vector<double> HVectorD;
+	
+	char opt;
+
+	if(argc != 2){
+		usage();
+		exit(1);
+	} else if(*(argv)[1] == 'p'){
+		cout << "Running parallel method" << endl;
+		opt = 'p';
+	} else if(*(argv)[1] == 's'){
+		cout << "Running serial method" << endl;
+		opt = 's';
+	} else{	
+		usage();
+		exit(1);
+	}
+		
+	
+	
+
 	string line;
 	ifstream myfile ("input.txt");
 	if (myfile.is_open())
@@ -56,6 +88,26 @@ int main(){
 
 	
 		myfile.close();
+
+		
+		HVectorD h_vect_a = A;
+		HVectorD h_vect_b = B;
+		HVectorD h_vect_c = C;
+		HVectorD h_vect_d = D;
+		HVectorD h_vect_results;
+		if(opt == 'p'){
+			h_vect_results = cyclic_reduction::Solve(n,
+						h_vect_a,
+						h_vect_b,
+						h_vect_c,
+						h_vect_d
+					);
+			
+			utils::LogProgramResults("Cyclic Reduction Method Results",h_vect_results);
+		}
+
+		//utils::PrintVector(true,"X",h_vect_results);
+
 	}
 	else cout <<"Unable to open file";
 

@@ -3,16 +3,18 @@
 #include <cyclic-reduction/cu_cr_solver.h>
 #include <utils/utils.h>
 
+#include <thrust/detail/vector_base.h>
+
+#include <memory>
+
+#define TESTCRC(name) \
+	TEST_F(CyclicReductionTest,name)
+
 #define CRCTEST(name) \
 	TEST(CyclicReductionCalculationTest,name)	
 
 #define CRUTEST(name) \
 	TEST(CyclicReductionUtilityTest,name)
-
-
-
-using namespace cyclic_reduction;
-
 
 /**
 *	This test file holds all tests for unit testing methods for the cyclic-reduction method of
@@ -20,133 +22,148 @@ using namespace cyclic_reduction;
 * 	Methods are tested in same order they are declared in header files.
 **/
 
-/*
-*	System Test
-*/
 
 
-/*
-*           T *  X   =  D      
-* | 2 3 0 0 |   |x1|   |2|            |-0.909|
-* | 1 3 2 0 | * |x2| = |4|   ==> X ~= | 1.273|
-* | 0 2 4 1 |   |x3|   |6|            | 0.545|
-* | 0 0 3 5 |   |x4|   |8|            | 1.273|
-*/
-TEST(CyclicReductionSystemTest,GeneralCase1){
-	int size = 4;
+using namespace cyclic_reduction;
 
-	HVectorD h_vect_a(size),
-		h_vect_b(size),
-		h_vect_c(size),
-		h_vect_d(size),
-		h_vect_results_actual(size),
-		h_vect_results_expected(size);
+class CyclicReductionTest : public ::testing::Test{
 
-	for(int i=0; i<size; i++){
-		h_vect_a[i] = i;
-		h_vect_b[i] = i+2;
-		h_vect_c[i] = size-i-1;
-		h_vect_d[i] = (i+1)*2;	
+protected:
+	typedef thrust::detail::vector_base<double,std::allocator<double>> HIterator;
+//SetUp Methods
+	static void SetUpTestCase(){
+		n = 10;
+		level = 4;
+		GenVectors();
 	}
 
-	h_vect_results_actual = Solve(size,
-					h_vect_a,
-					h_vect_b,
-					h_vect_c,
-					h_vect_d
-				);
-/*
-	utils::PrintVector(true,"A",h_vect_a);
-	utils::PrintVector(true,"B",h_vect_b);
-	utils::PrintVector(true,"C",h_vect_c);
-	utils::PrintVector(true,"D",h_vect_d);
-	utils::PrintVector(true,"X",h_vect_results_actual);
-*/
-
-}
-
-TEST(CyclicReductionSystemTest, GeneralCase2){
-	int size = 4;
-
-	HVectorD h_vect_a(size),
-		h_vect_b(size),
-		h_vect_c(size),
-		h_vect_d(size),
-		h_vect_results_actual(size),
-		h_vect_results_expected(size);
-
-	for(int i=0; i<size; i++){
-		h_vect_a[i] = 1;
-		h_vect_b[i] = 1;
-		h_vect_c[i] = 1;
-		h_vect_d[i] = 1;	
+	virtual void SetUp(){
+		h_vect_results_e.resize(n);
+		h_vect_results_a.resize(n);
 	}
-	h_vect_results_actual = Solve(size,
-					h_vect_a,
-					h_vect_b,
-					h_vect_c,
-					h_vect_d
-				);
-/*
-	utils::PrintVector(true,"A",h_vect_a);
-	utils::PrintVector(true,"B",h_vect_b);
-	utils::PrintVector(true,"C",h_vect_c);
-	utils::PrintVector(true,"D",h_vect_d);
-	utils::PrintVector(true,"X",h_vect_results_actual);
-
-*/
 	
-}
+//Protected Data Members
+	static int n,level;
+	
+	//Host vectors for the matrix diagonals of matrix T and the column matrices D and X
+	static HVectorD h_vect_a,
+			h_vect_b,
+			h_vect_c,
+			h_vect_d,
+			h_vect_x;
+
+	//Host vectors for calculation results
+	static HVectorD h_vect_a_prime,
+			h_vect_c_prime;
+
+	//Host vectors for the results of the method calls
+	HVectorD h_vect_results_e; //Expected result
+	HVectorD h_vect_results_a; //Actual result
+
+	//Device vectors for the matrix diagonals of matrix T and column matrices D and X
+	DVectorD d_vect_a,
+		d_vect_b,
+		d_vect_c,
+		d_vect_d,
+		d_vect_x;
+
+	//Device vectors for the calculation results
+	DVectorD d_vect_a_prime,
+		d_vect_c_prime;
+
+//Protected Methods
+	void LogResults(std::string name){
+		LogVector(name+":Actual",h_vect_results_a);
+		LogVector(name+":Expected",h_vect_results_e);
+	}
+
+	void CheckResults(){
+		for(int i = 0; i < n; i++){
+			EXPECT_EQ(h_vect_results_e[i],h_vect_results_a[i]);
+		}
+	}
+
+	void LogVectors(std::string name){
+		LogVector(name+":A",h_vect_a);	
+		LogVector(name+":B",h_vect_b);
+		LogVector(name+":C",h_vect_c);
+		LogVector(name+":D",h_vect_d);
+		LogVector(name+":X",h_vect_x);
+	
+		LogVector(name+":A'", h_vect_a_prime);
+		LogVector(name+":C'", h_vect_c_prime);
+	}	
+
+	void LogVector(std::string name, HVectorD vector){
+		utils::PrintVector(true,
+			 name,
+			vector 
+		);
+	}
 
 
+private:
+	static void GenVectors(){
+		h_vect_a.resize(n,0.00);
+		h_vect_b.resize(n,0.00);
+		h_vect_c.resize(n,0.00);
+		h_vect_d.resize(n,0.00);
+		h_vect_x.resize(n,0.00);
+		h_vect_a_prime.resize(n,0.00);
+		h_vect_c_prime.resize(n,0.00);
+
+		for(int i = 0; i < n; i++){
+			// A B C D X A' C'
+			h_vect_a[i] = i+1;
+			h_vect_b[i] = i+2;
+			h_vect_c[i] = i+1;
+			h_vect_d[i] = i+2;
+			h_vect_x[i] = i+3;
+
+			h_vect_a_prime[i] = i+1;
+			h_vect_c_prime[i] = i+2;
+		}
+	}
+
+	static void SetupHVectorD(HVectorD *vector, int start){
+		vector->resize(n,0.00);
+		
+		thrust::sequence(vector->begin(),vector->end(),start);
+	}
+};
 
 /*
+* CyclicReductionTest class static data members
+*/
+
+int CyclicReductionTest::n = 0,CyclicReductionTest::level = 0;
+
+HVectorD CyclicReductionTest::h_vect_a,
+	CyclicReductionTest::h_vect_b,
+	CyclicReductionTest::h_vect_c,
+	CyclicReductionTest::h_vect_d,
+	CyclicReductionTest::h_vect_x;
+
+
+HVectorD CyclicReductionTest::h_vect_a_prime,
+	CyclicReductionTest::h_vect_c_prime;
+
+/*
+*
 *	Calculation Method Tests
 */
 
-CRCTEST(LowerAlphaBeta){
-//Declarations
-	int n = 10;
-	int level = 3;
-	
-	HVectorD h_vect_a(n),
-		h_vect_a_prime(n),
-		h_vect_b(n),
-		h_vect_results(n);
-	
-	DVectorD d_vect_a(n),
-		d_vect_a_prime(n),
-		d_vect_b(n);
 
-//Initialize
+TESTCRC(LowerAlphaBeta){
+//Setup up expected results vector
 	for(int i =0; i <n; i++){
-		//Fill a
-		h_vect_a[i] = i+1;
-	
-		//Fill a_prime, this is done so there is nonzero data in before
-		h_vect_a_prime[i] = 1000+i;
-	
-		//Fill b
-		if(i%2 == 0){
-			h_vect_b[i] = 0.00;
-		} else{
-			h_vect_b[i] = 2.00;
-		}
-		//Fill results
 		if(i-level < 0){
-			h_vect_results[i] = 0.00;
+			h_vect_results_e[i] = 0.00;
 		} else if(h_vect_b[i-level] == 0.00){
-			h_vect_results[i] = 0.00;
+			h_vect_results_e[i] = 0.00;
 		} else{
-			h_vect_results[i] = (-h_vect_a[i] / h_vect_b[i-level]);
+			h_vect_results_e[i] = (-h_vect_a[i] / h_vect_b[i-level]);
 		}
-
-/*
-		//Print TODO for debugging the test
-		std::cout << "a[" << i << "]= " << h_vect_a[i] << std::endl
-			<< "b[" << i << "]= " << h_vect_b[i] << std::endl
-			<< "results[" << i << "]= " << h_vect_results[i] << std::endl;
-*/	
 	}
 
 		
@@ -162,67 +179,26 @@ CRCTEST(LowerAlphaBeta){
 		d_vect_b.data()
 	);
 
-//Copy from device to host 
-	h_vect_a_prime = d_vect_a_prime;
+//Copy results from device to host 
+	h_vect_results_a = d_vect_a_prime;
 
-//Check results
-	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_a_prime[i]);
-	}
+	CheckResults();
 
-}	
+}
 
-
-
-CRCTEST(UpperAlphaBeta){
-//Declarations
-	int n = 10;
-	int level = 2;
-	
-	HVectorD h_vect_c(n),
-		h_vect_c_prime(n),
-		h_vect_b(n),
-		h_vect_results(n);
-	
-	DVectorD d_vect_c(n),
-		d_vect_c_prime(n),
-		d_vect_b(n);
-
-//Initialize
-	for(int i =0; i <n; i++){
-		//Fill c
-		h_vect_c[i] = i+2;
-	
-		//Fill a_prime, this is done so there is nonzero data in before
-		h_vect_c_prime[i] = 1000+i;
-	
-		//Fill b
-		if(i%2 == 0){
-			h_vect_b[i] = 0.00;
-		} else{
-			h_vect_b[i] = 3.00;
-		}
-	}
+TESTCRC(UpperAlphaBeta){
+//Fill results
 	for(int i = 0; i < n; i++){
-		//Fill results
 		if(i+level >= n){
-			h_vect_results[i] = 0.00;
+			h_vect_results_e[i] = 0.00;
 		} else if(h_vect_b[i+level] == 0.00){
-			h_vect_results[i] = 0.00;
+			h_vect_results_e[i] = 0.00;
 		} else{
-			h_vect_results[i] = (-h_vect_c[i] / h_vect_b[i+level]);
+			h_vect_results_e[i] = (-h_vect_c[i] / h_vect_b[i+level]);
 		}
-
-/*		
-		//Print TODO for debugging the test
-		std::cout << "a[" << i << "]= " << h_vect_c[i] << std::endl
-			<< "b[" << i << "]= " << h_vect_b[i] << std::endl
-			<< "results[" << i << "]= " << h_vect_results[i] << std::endl;
-*/		
 	}
 
 		
-//Copy from host to device
 	d_vect_c = h_vect_c;
 	d_vect_c_prime = h_vect_c_prime;
 	d_vect_b = h_vect_b;
@@ -234,60 +210,23 @@ CRCTEST(UpperAlphaBeta){
 		d_vect_c_prime.data()
 	);
 
-//Copy from device to host 
-	h_vect_c_prime = d_vect_c_prime;
+	h_vect_results_a = d_vect_c_prime;
 
-//Check results
-	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_c_prime[i]);
-	}
-
-
+	//LogVector("Actual",h_vect_results_a);
+	CheckResults();
 }
 
 
-CRCTEST(MainFront){
-	//Declarations
-	int n = 10;
-	int level = 4;
-	
-	HVectorD h_vect_a_prime(n),
-		h_vect_b(n),
-		h_vect_c(n),
-		h_vect_results(n);
-	
-	DVectorD d_vect_a_prime(n),
-		d_vect_b(n),
-		d_vect_c(n);
 
-//Initialize
-	for(int i =0; i <n; i++){
-		//Fill a_prime
-		h_vect_a_prime[i] = i+1;
-	
-		//Fill the initial values of v
-		h_vect_b[i] = i;
-	
-		//Fill c
-		h_vect_c[i] = (i+1)*2;
-	}
-
+TESTCRC(MainFront){
 	//Fill results	
 	for(int i = 0; i < n; i++){
 		if(i-level >= 0){
-			h_vect_results[i] = h_vect_b[i] + (h_vect_a_prime[i] * h_vect_c[i-level]);
+			h_vect_results_e[i] = h_vect_b[i] + (h_vect_a_prime[i] * h_vect_c[i-level]);
 		} else{
-			h_vect_results[i] = h_vect_b[i];
+			h_vect_results_e[i] = h_vect_b[i];
 		}	
 	}
-/*
-	utils::PrintVector(true,"A'",h_vect_a_prime);
-	utils::PrintVector(true,"B",h_vect_b);
-	utils::PrintVector(true,"C",h_vect_c);
-	utils::PrintVector(true,"Results",h_vect_results);
-*/
-
-
 		
 //Copy from host to device
 	d_vect_a_prime = h_vect_a_prime;
@@ -295,61 +234,28 @@ CRCTEST(MainFront){
 	d_vect_c = h_vect_c;
 
 //Call method to be tested
+	MainFront(n,level,
+		d_vect_a_prime.data(),
+		d_vect_b.data(),
+		d_vect_c.data()
+	);
 
-	//TODO call method
-
+	
 //Copy from device to host 
-	h_vect_b = d_vect_b;
+	h_vect_results_a = d_vect_b;
 
-//Check results
-	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_b[i]);
-	}
-
+	CheckResults();
 }
 
-/*
-CRCTEST(SolutionFront){
-	//Declarations
-	int n = 10;
-	int level = 4;
-	
-	HVectorD h_vect_a_prime(n),
-		h_vect_d(n),
-		h_vect_x(n),
-		h_vect_results(n);
-	
-	DVectorD d_vect_a_prime(n),
-		d_vect_d(n),
-		d_vect_x(n);
-
-//Initialize
-	for(int i =0; i <n; i++){
-		//Fill a_prime
-		h_vect_a_prime[i] = i+1;
-	
-		//Fill the initial values of X
-		h_vect_x[i] = i+3;
-	
-		//Fill D
-		h_vect_d[i] = i+2;
-	}
-
-	//Fill results	
+TESTCRC(SolutionFront){
+//Fill results	
 	for(int i = 0; i < n; i++){
 		if(i-level >= 0){
-			h_vect_results[i] = h_vect_x[i] + (h_vect_a_prime[i] * h_vect_d[i-level]);
+			h_vect_results_e[i] = h_vect_x[i] + (h_vect_a_prime[i] * h_vect_d[i-level]);
 		} else{
-			h_vect_results[i] = h_vect_x[i];
+			h_vect_results_e[i] = h_vect_x[i];
 		}	
 	}
-
-	utils::PrintVector(true,"A'",h_vect_a_prime);
-	utils::PrintVector(true,"D",h_vect_d);
-	utils::PrintVector(true,"X",h_vect_x);
-	utils::PrintVector(true,"Results",h_vect_results);
-
-
 
 		
 //Copy from host to device
@@ -358,7 +264,7 @@ CRCTEST(SolutionFront){
 	d_vect_x = h_vect_x;
 
 //Call method to be tested
-	MainFront(n,level,
+	SolutionFront(n,level,
 		d_vect_a_prime.data(),
 		d_vect_d.data(),
 		d_vect_x.data()
@@ -366,14 +272,122 @@ CRCTEST(SolutionFront){
 
 
 //Copy from device to host 
-	h_vect_b = d_vect_b;
+	h_vect_results_a = d_vect_x;
 
-//Check results
-	for(int i=0; i <n; i++){
-		EXPECT_EQ(h_vect_results[i],  h_vect_b[i]);
+	CheckResults();
+}
+
+TESTCRC(LowerFront){
+
+//Fill results	
+	for(int i = 0; i < n; i++){
+		if(i-level >= 0){
+			h_vect_results_e[i] = h_vect_a_prime[i] * h_vect_a[i-level]; 
+		} else{
+			h_vect_results_e[i] = h_vect_a_prime[i];
+		}	
+	}
+		
+//Copy from host to device
+	d_vect_a = h_vect_a;
+	d_vect_a_prime = h_vect_a_prime;
+
+//Call method to be tested
+	LowerFront(n,level,
+		d_vect_a.data(),
+		d_vect_a_prime.data()
+	);	
+
+//Copy from device to host 
+	h_vect_results_a = d_vect_a_prime;
+		
+	CheckResults();
+}
+
+
+TESTCRC(MainBack){
+
+//Fill results
+	for(int i = 0; i < n; i++){
+		if(i+level < n){
+			h_vect_results_e[i] = h_vect_b[i] + (h_vect_c_prime[i] * h_vect_a[i+level]);
+		} else{
+			h_vect_results_e[i] = h_vect_b[i];
+		}
 	}
 
+//Copy from host to device
+	d_vect_a = h_vect_a;
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_b = h_vect_b;
+
+//Call method to be tested
+	MainBack(n, level,
+		d_vect_a.data(),
+		d_vect_c_prime.data(),
+		d_vect_b.data()
+	);
+
+//Copy from device to host
+	h_vect_results_a = d_vect_b;
+
+	CheckResults();
 }
+
+TESTCRC(SolutionBack){
+
+	for(int i = 0; i < n; i++){
+		if(i+level < n){
+			h_vect_results_e[i] = h_vect_x[i] + ( h_vect_c_prime[i] * h_vect_d[i+level] );		
+		} else{
+			h_vect_results_e[i] = h_vect_x[i];
+		}
+	}
+
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_d = h_vect_d;
+	d_vect_x = h_vect_x;
+
+	SolutionBack(n,level,
+		d_vect_c_prime.data(),
+		d_vect_d.data(),
+		d_vect_x.data()
+	);
+
+	h_vect_results_a = d_vect_x;
+
+	CheckResults();
+}
+
+TESTCRC(UpperBack){
+
+	for(int i = 0; i < n; i++){
+		if(i+level < n){
+			h_vect_results_e[i] = h_vect_c_prime[i] * h_vect_c[i+level];
+		} else{
+			h_vect_results_e[i] = h_vect_c_prime[i];
+		}
+	}
+
+	d_vect_c_prime = h_vect_c_prime;
+	d_vect_c = h_vect_c;
+
+	UpperBack(n,level,
+		d_vect_c.data(),
+		d_vect_c_prime.data()
+	);
+
+	h_vect_results_a = d_vect_c_prime;
+
+	LogVectors("UpperBackTest");
+	LogResults("UpperBackTest");
+
+	CheckResults();
+
+}
+
+/*
+*	Calculation Method Tests
 */
 /*
 * ==========Utility Method Tests==========

@@ -1,5 +1,8 @@
 #include "gtest/gtest.h"
 #include <serial_tSolver.h>
+#include <thrust/host_vector.h>
+
+using namespace thrust;
 
 TEST( serialTest, systemTest )
 {
@@ -15,14 +18,14 @@ TEST( serialTest, systemTest )
 	d[0] = 5; d[1] = 5; d[2] = 10; d[3] = 23.0;
 
 	host_vector<double> actual(4);
-	host_vector<double> exp(4);
-	exp[0] = 2; exp[1] = 3; exp[2] = 5; exp[7];
+	host_vector<double> expect(4);
+	expect[0] = 2; expect[1] = 3; expect[2] = 5; expect[3] = 7;
 
-	actual = serial_solve(a, b, c, d);
+	actual = serial_solve(n, a, b, c, d);
 
 
 	for(int i = 0; i < n; i++)
 	{
-		EXPECT_EQ(exp[i], actual[i]);
+		EXPECT_EQ(expect[i], actual[i]);
 	}
 }

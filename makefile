@@ -32,7 +32,7 @@ CRM = $(addprefix $(CR), cu_cr_functors.cu cu_cr_solver.cu cu_cr_solver.h cu_cr_
 UTILS = $(addprefix $(UTIL), utils.cu utils.h) 
 
 #Test Files
-TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu test_functors.cu test_serial_tSolver.cu)
+TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu test_functors.cu test_serial_tSolver.cu test_cr_system.cu)
 
 
 #-----RUN COMMANDS-----

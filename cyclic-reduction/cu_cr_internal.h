@@ -125,7 +125,6 @@ namespace cyclic_reduction{
 
 	
 	/*
-	 * TODO needs testing
 	 * Modifies d_ptr_c_prime
 	 *
 	 * Multiples AlphaBeta calculation of qualifying elements in upper diagonal by neighbor element in 

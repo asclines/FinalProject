@@ -39,7 +39,7 @@ TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu te
 install: init program
 
 run: 
-	./$(EXEDIR)program
+	./$(EXEDIR)program p
 
 test: init test_all clean_log
 	./$(EXEDIR)test_all 

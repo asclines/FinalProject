@@ -38,23 +38,23 @@ TF = $(addprefix $(TEST), test_all.cu test_cr.cu test_input.cu test_solver.cu te
 #-----RUN COMMANDS-----
 install: init program
 
-run: 
+run: init
 	./$(EXEDIR)program p
 
-test: init test_all clean_log
+test: init test_all
 	./$(EXEDIR)test_all 
 
 clean: clean_log
 	@(rm bin/* gen/* *.out program test_all) &> /dev/null || true
 
 clean_log:
-	@(rm log.txt) &> /dev/null || true
+	@(rm output.txt log.txt) &> /dev/null || true
 clean_objs:
 	@(rm *.o) &> /dev/null || true
 
 #-----MAKE COMMANDS-----
 
-init: 
+init: clean_log 
 	@(mkdir bin gen) &> /dev/null || true
 
 program: triSolver.cu $(OBJS)

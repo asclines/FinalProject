@@ -102,10 +102,11 @@ int main(int argc, const char *argv[]){
 						h_vect_c,
 						h_vect_d
 					);
+			
+			utils::LogProgramResults("Cyclic Reduction Method Results",h_vect_results);
 		}
 
-
-		utils::PrintVector("X",h_vect_results);
+		//utils::PrintVector(true,"X",h_vect_results);
 
 	}
 	else cout <<"Unable to open file";

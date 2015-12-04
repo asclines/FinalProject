@@ -3,7 +3,16 @@
 #include <fstream>
 
 namespace utils{
-const std::string LOG_FILE = "log.txt";
+static std::string LOG_FILE = "log.txt";
+
+void LogProgramResults(std::string name, HostD vector){
+	LOG_FILE = "output.txt";
+	Log("===========================================================================================================\n\n                                  " + name + "                                         \n\n===========================================================================================================");
+	
+	PrintVector(true,"X",vector);
+	LOG_FILE = "log.txt";
+}
+
 
 void PrintVector(std::string name, HostD vector){
 	for(int i=0; i <vector.size(); i++){

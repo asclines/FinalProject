@@ -57,8 +57,8 @@ clean_objs:
 init: clean_log 
 	@(mkdir bin gen) &> /dev/null || true
 
-program: triSolver.cu $(OBJS)
-	$(CC) $(IF) $(OBJS) -o $(EXEDIR)program triSolver.cu 
+program: program.cu $(OBJS)
+	$(CC) $(IF) $(OBJS) -o $(EXEDIR)program program.cu 
 
 test_all: $(TF) $(OBJS)
 	$(CC) $(IF) $(OBJS)  -o $(EXEDIR)test_all $(TEST)test_all.cu $(LIBS) $(CFLAGS) 

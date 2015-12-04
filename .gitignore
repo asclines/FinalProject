@@ -2,7 +2,7 @@
 .*.swp
 
 # Generated Files
-# bin/*
-# gen/*
+bin/*
+gen/*
 log.txt
 gmon.out

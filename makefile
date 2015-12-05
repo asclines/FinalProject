@@ -4,7 +4,7 @@ CC=nvcc
 DB=-g -G
 LIBS=-lgtest -lpthread
 IF = -I ./ 
-CFLAGS=--std=c++11 -g -G -pg -O0
+CFLAGS=--std=c++11 -g -G  -pg -O0
 
 #Locations
 EXEDIR = gen/

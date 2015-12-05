@@ -4,6 +4,7 @@
 
 #include <cuda.h>
 #include <math.h>
+#include <thread>
 
 #include <thrust/copy.h>
 #include <thrust/functional.h>
@@ -31,7 +32,6 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 	d_vect_c = h_vect_c;
 	d_vect_d = h_vect_d;
 
-//	InitSolutionDPtrD(size, d_vect_d.data(), d_vect_x.data());
 	
 
 //Foward Reduction Phase
@@ -40,6 +40,24 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 	while(level < size){
 
 	//AlphaBeta Methods
+/*		std::thread lab(LowerAlphaBeta,
+				size,level,
+				d_vect_a.data(),
+				d_vect_a_prime.data(),
+				d_vect_b.data()
+		);
+
+		std::thread uab(UpperAlphaBeta,
+				size,level,
+				d_vect_b.data(),
+				d_vect_c.data(),
+				d_vect_c_prime.data()
+		);
+*/
+		d_vect_x = d_vect_d;
+
+//		lab.join();
+//		uab.join();
 
 		LowerAlphaBeta(size,level,
 			d_vect_a.data(),
@@ -52,9 +70,7 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 			d_vect_c.data(),
 			d_vect_c_prime.data()
 		);
-
 	
-		d_vect_x = d_vect_d;
 	
 	//Front Methods
 		
@@ -98,23 +114,6 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 		d_vect_a = d_vect_a_prime;
 		d_vect_c = d_vect_c_prime;
 		d_vect_d = d_vect_x;
-/*
-		thrust::copy(
-			d_vect_a.begin(), d_vect_a.end(),
-			d_vect_a_prime.begin()
-		);
-
-		thrust::copy(
-			d_vect_c.begin(), d_vect_c.end(),
-			d_vect_c_prime.begin()
-		);
-
-		thrust::copy(
-			d_vect_d.begin(), d_vect_d.end(),
-			d_vect_x.begin()
-		);
-
-*/
 
 		level *= 2;
 	}
@@ -137,7 +136,7 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 
 void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD d_ptr_b){
 
-	InitDPtrD(n,d_ptr_a_prime);
+//	InitDPtrD(n,d_ptr_a_prime);
 	thrust::transform(
 		d_ptr_a + level, d_ptr_a + n,
 		d_ptr_b,
@@ -149,7 +148,7 @@ void LowerAlphaBeta(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime, DPtrD 
 
 void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
 
-	InitDPtrD(n,d_ptr_c_prime);	
+//	InitDPtrD(n,d_ptr_c_prime);	
 	thrust::transform(
 		d_ptr_c , d_ptr_c + (n-level),
 		d_ptr_b + level,
@@ -163,7 +162,7 @@ void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_
 void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c){
 
 	DVectorD d_vect_temp(n); //TODO see about freeing this memory, and condensing space
-	InitDPtrD(n, d_vect_temp.data());
+	InitDPtrD(n-level, d_vect_temp.data());
 	
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
@@ -183,7 +182,7 @@ void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr
 
 
 void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x ){
-	DVectorD d_vect_temp(n);
+	DVectorD d_vect_temp(n-level);
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
@@ -217,8 +216,8 @@ void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 //(rank + span < n)
 void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b){
 
-	DVectorD d_vect_temp(n);
-	InitDPtrD(n, d_vect_temp.data());
+	DVectorD d_vect_temp(n-1,0.00);
+//	InitDPtrD(n, d_vect_temp.data());
 	
 	thrust::transform(
 		d_ptr_c_prime , d_ptr_c_prime + (n - level),
@@ -236,7 +235,7 @@ void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_
 }
 
 void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x){
-	DVectorD d_vect_temp(n); 
+	DVectorD d_vect_temp(n-level); 
 	
 	thrust::transform(
 		d_ptr_c_prime, d_ptr_c_prime + (n-level),

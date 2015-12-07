@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "cu_triSolver.h"
-#include <vector>
 #include <sstream>
 #include <utils/utils.h>
 #include <cyclic-reduction/cu_cr_solver.h>

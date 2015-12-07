@@ -14,7 +14,6 @@
 * For method documentation see cu_cr_internal.h unless otherwise specified.
 */
 
-
 namespace cyclic_reduction{
 
 HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c, HVectorD h_vect_d){
@@ -28,12 +27,10 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 		d_vect_c_prime(size,0.00),
 		d_vect_temp(size,0.00);
 
-
 	d_vect_a = h_vect_a;
 	d_vect_b = h_vect_b;
 	d_vect_c = h_vect_c;
 	d_vect_d = h_vect_d;
-
 
 //Define and create Cuda Streams
 	
@@ -46,12 +43,8 @@ HVectorD Solve(int size, HVectorD h_vect_a, HVectorD h_vect_b, HVectorD h_vect_c
 
 	int level = 1;
 	while(level < size){
-		
-
 
 	//AlphaBeta Methods
-		
-	
 		d_vect_x = d_vect_d;
 
 		LowerAlphaBeta(size,level,
@@ -158,12 +151,8 @@ void UpperAlphaBeta(int n, int level, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_
 
 }
 
-//(rank - span >= 0)
 void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_temp){
 
-//	DVectorD d_vect_temp(n);
-//	InitDPtrD(n-level, d_vect_temp.data());
-	
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
 		d_ptr_c,
@@ -180,9 +169,7 @@ void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr
 
 }
 
-
 void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x, DPtrD d_ptr_temp ){
-//	DVectorD d_vect_temp(n-level);
 
 	thrust::transform(
 		d_ptr_a_prime + level, d_ptr_a_prime + n,
@@ -200,7 +187,6 @@ void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d
 
 }
 
-
 void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 
 	thrust::transform(
@@ -211,14 +197,8 @@ void LowerFront(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_a_prime){
 	);	
 }
 
-
-
-//(rank + span < n)
 void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b, DPtrD d_ptr_temp){
 
-//	DVectorD d_vect_temp(n-1,0.00);
-//	InitDPtrD(n, d_vect_temp.data());
-	
 	thrust::transform(
 		d_ptr_c_prime , d_ptr_c_prime + (n - level),
 		d_ptr_a + level,
@@ -235,7 +215,6 @@ void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_
 }
 
 void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x, DPtrD d_ptr_temp){
-//	DVectorD d_vect_temp(n-level); 
 	
 	thrust::transform(
 		d_ptr_c_prime, d_ptr_c_prime + (n-level),
@@ -264,11 +243,4 @@ void UpperBack(int n, int level, DPtrD d_ptr_c, DPtrD d_ptr_c_prime){
 	);	
 }
 
-
-
-
-
-
 }//END - namespace
-
-

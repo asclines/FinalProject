@@ -85,7 +85,7 @@ namespace cyclic_reduction{
  	 * in the lower diagonal with neighboring upper element to qualifying main diagonal elements.
  	 * Stores result at position of element in the main diagonal.
  	 */	
-	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c);
+	void MainFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_b, DPtrD d_ptr_c, DPtrD d_ptr_temp);
 
 	/*
 	 * Modifies d_ptr_x
@@ -94,7 +94,7 @@ namespace cyclic_reduction{
 	 * in the lower diagonal with neighboring element in the right side column to the qualifying
 	 * solution column elements.
 	 */
-	void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
+	void SolutionFront(int n, int level, DPtrD d_ptr_a_prime, DPtrD d_ptr_d, DPtrD d_ptr_x, DPtrD d_ptr_temp);
 
 	/*
  	 * Modifies d_ptr_a_prime
@@ -112,7 +112,7 @@ namespace cyclic_reduction{
 	 * Then adds the result of the multiplicaiton to the value of the element in the main diagonal.
 	 * Stores result at position of element in the main diagonal.
 	 */	
-	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b);
+	void MainBack(int n, int level, DPtrD d_ptr_a, DPtrD d_ptr_c_prime, DPtrD d_ptr_b, DPtrD d_ptr_temp);
 
 	/*
 	 * Modifies d_ptr_x
@@ -121,7 +121,7 @@ namespace cyclic_reduction{
 	 * upper diagonal with neighboring element in the right side column to the qualifying solution
 	 * column elements.
 	 */
-	void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x);
+	void SolutionBack(int n, int level, DPtrD d_ptr_c_prime, DPtrD d_ptr_d, DPtrD d_ptr_x, DPtrD d_ptr_temp);
 
 	
 	/*
